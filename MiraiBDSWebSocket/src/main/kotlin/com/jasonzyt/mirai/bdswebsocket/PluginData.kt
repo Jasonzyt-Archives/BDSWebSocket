@@ -5,9 +5,8 @@ import kotlinx.serialization.*
 
 @Serializable
 data class GameInfo (
-    var name: String = "",
-    var xuid: Long = 0,
-    var set: Boolean = false
+    var name: String,
+    var xuid: Long
 )
 
 object PluginData : AutoSavePluginData("data") {

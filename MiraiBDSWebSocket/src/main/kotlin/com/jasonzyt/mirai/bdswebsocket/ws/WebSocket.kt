@@ -3,18 +3,23 @@ package com.jasonzyt.mirai.bdswebsocket.ws
 import com.jasonzyt.mirai.bdswebsocket.*
 import org.java_websocket.framing.CloseFrame
 import org.java_websocket.handshake.ServerHandshake
+import java.net.ConnectException
 import java.net.URI
 import java.util.*
 
 class AutoConnectWebSocket : TimerTask() {
     override fun run() {
         for (cli in clients) {
-            if (!cli.isOpen)
-                cli.connect()
+            try {
+                PluginMain.logger.info("Try connect")
+                if (!cli.isOpen)
+                    cli.connect()
+            }
+            catch (e: ConnectException) {}
         }
     }
 }
-class WebSocketClient(var serverUri: URI?) : org.java_websocket.client.WebSocketClient(serverUri) {
+class WebSocketClient(private var serverUri: URI?) : org.java_websocket.client.WebSocketClient(serverUri) {
     fun send(rawMessage: RawMessage) {
         send(rawMessage.toString())
     }
@@ -33,6 +38,7 @@ class WebSocketClient(var serverUri: URI?) : org.java_websocket.client.WebSocket
                 "[Mirai-BDSWS][WebSocket] WebSocket server connection abnormal closed! URI: "
                     + serverUri.toString() + " Reason: " + reason
             )
+            return
         }
         PluginMain.logger.info("[Mirai-BDSWS][WebSocket] WebSocket server connection closed! URI: " + serverUri.toString())
     }
