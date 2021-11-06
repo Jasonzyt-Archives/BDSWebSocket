@@ -3,11 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
-# FakePlayerHelper
+# BDSWebSocket
 RELEASES
-FakePlayerHelper/build.h
-BuildRelease.exe
-BuildRelease.pdb
+Test.bat
+/BDSWebSocket/lib/cryptopp-static.lib
 
 # User-specific files
 *.rsuser
