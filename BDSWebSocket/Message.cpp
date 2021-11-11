@@ -7,8 +7,7 @@ std::string RawMessage::toJson() {
 }
 
 RawMessage RawMessage::fromJson(const std::string& str) {
-	nlohmann::json json;
-	json.parse(str);
+	nlohmann::json json = json.parse(str);
 	return json.get<RawMessage>();
 }
 
@@ -18,7 +17,6 @@ std::string Message::toJson() {
 }
 
 Message Message::fromJson(const std::string& str) {
-	nlohmann::json json;
-	json.parse(str);
+	nlohmann::json json = json.parse(str);
 	return json.get<Message>();
 }

@@ -1,20 +1,15 @@
-#include <unordered_set>
-#include <mutex>
-#include <queue>
+#include "pch.h"
 #include <loader/hash.h>
 #include <nlohmann/json.hpp>
+#include <crow/crow_all.h>
 #include "Message.h"
 #include "Crypt.h"
-#include "Logger.h"
-
-#define CROW_MAIN
-#include "crow/crow_all.h"
+#include "BDSWebSocket.h"
 
 #define H do_hash
 
 using namespace std;
-
-queue<function<void(const Message&)>> exec;
+using namespace Logger;
 
 void parseMessage(const Message& msg) {
 	switch ((msg.type.empty() ? H(msg.event) : H(msg.type)))
@@ -27,27 +22,44 @@ void parseMessage(const Message& msg) {
 	}
 }
 
+
+crow::SimpleApp app;
+
 void runWebSocketServer(unsigned short port) {
-	crow::SimpleApp app;
-	std::unordered_map<std::string, crow::websocket::connection&> clients;
-	std::mutex mtx;
 
 	CROW_ROUTE(app, "/").websocket()
+
 		.onerror([&](crow::websocket::connection& conn) {
-			
+				auto addr = conn.get_remote_ip();
+				auto port = conn.get_remote_port();
+				Warn() << bdsws->lpk->localization("ws.onerror", addr, port) << endl;
 			})
+
 		.onopen([&](crow::websocket::connection& conn) {
-				lock_guard<mutex> _a(mtx);
-				clients.emplace(conn.get_remote_ip(), conn);
+				lock_guard<mutex> _a(bdsws->ws_mtx);
+				auto addr = conn.get_remote_ip();
+				auto port = conn.get_remote_port();
+				bdsws->clients.emplace(addr, conn);
+				//if (bdsws->cfg->IPWhiteList);
+				Warn() << bdsws->lpk->localization("ws.onopen", addr, port) << endl;
 			})
+
 		.onclose([&](crow::websocket::connection& conn, const std::string& reason) {
-				lock_guard<mutex> _a(mtx);
-				clients.erase(conn.get_remote_ip());
+				lock_guard<mutex> _a(bdsws->ws_mtx);
+				auto addr = conn.get_remote_ip();
+				auto port = conn.get_remote_port();
+				bdsws->clients.erase(conn.get_remote_ip());
+				Warn() << bdsws->lpk->localization("ws.onclose", addr, port) << endl;
 			})
+
 		.onmessage([&](crow::websocket::connection& conn, const std::string& data, bool is_binary) {
+				auto addr = conn.get_remote_ip();
+				auto port = conn.get_remote_port(); 
+				Info() << bdsws->lpk->localization("onreceived",
+					addr, port, (is_binary ? "[BINARY]" : data)) << endl;
 				if (is_binary) return;
-				RawMessage msg = RawMessage::fromJson(data);
 				try {
+					RawMessage msg = RawMessage::fromJson(data);
 					if (msg.encrypted) {
 						// if (msg.mode == "AES/CBC/PKCS5Padding") {
 
@@ -59,5 +71,12 @@ void runWebSocketServer(unsigned short port) {
 				}
 			});
 
-	app.port(port).multithreaded().run();
+	thread th([&]() {	
+		app.port(port).multithreaded().run();
+	});
+	th.detach();
+}
+
+void stopWebSocketServer() {
+	app.stop();
 }

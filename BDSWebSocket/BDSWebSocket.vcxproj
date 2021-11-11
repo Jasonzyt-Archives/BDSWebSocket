@@ -142,17 +142,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BDSWebSocket.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="Crypt.h" />
     <ClInclude Include="ExtendedJson.h" />
     <ClInclude Include="LangPack.h" />
     <ClInclude Include="Logger.h" />
-    <ClInclude Include="mess.h" />
+    <ClInclude Include="Mess.h" />
     <ClInclude Include="Message.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Symbols.h" />
     <ClInclude Include="WebSocketServer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BDSWebSocket.cpp" />
     <ClCompile Include="Crypt.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ExtendedJson.cpp" />

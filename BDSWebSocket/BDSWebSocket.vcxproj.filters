@@ -17,7 +17,7 @@
     <ClInclude Include="Config.h">
       <Filter>Others</Filter>
     </ClInclude>
-    <ClInclude Include="mess.h">
+    <ClInclude Include="Mess.h">
       <Filter>Others</Filter>
     </ClInclude>
     <ClInclude Include="Crypt.h">
@@ -26,6 +26,8 @@
     <ClInclude Include="LangPack.h">
       <Filter>Others</Filter>
     </ClInclude>
+    <ClInclude Include="BDSWebSocket.h" />
+    <ClInclude Include="Symbols.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -43,6 +45,7 @@
     <ClCompile Include="Crypt.cpp">
       <Filter>WebSocket</Filter>
     </ClCompile>
+    <ClCompile Include="BDSWebSocket.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Lib">

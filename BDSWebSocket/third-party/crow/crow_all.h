@@ -2256,6 +2256,7 @@ namespace crow
             virtual void send_pong(const std::string& msg) = 0;
             virtual void close(const std::string& msg = "quit") = 0;
             virtual std::string get_remote_ip() = 0;
+            virtual unsigned short get_remote_port() = 0;
             virtual ~connection(){}
 
             void userdata(void* u) { userdata_ = u; }
@@ -2418,6 +2419,11 @@ namespace crow
                 std::string get_remote_ip() override 
                 {
                     return adaptor_.remote_endpoint().address().to_string();
+                }
+
+                unsigned short get_remote_port() override
+                {
+                    return adaptor_.remote_endpoint().port();
                 }
 
             protected:

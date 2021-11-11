@@ -6,7 +6,7 @@
 # BDSWebSocket
 RELEASES
 Test.bat
-/BDSWebSocket/lib/cryptopp-static.lib
+#/BDSWebSocket/lib/cryptopp-static.lib
 
 # User-specific files
 *.rsuser

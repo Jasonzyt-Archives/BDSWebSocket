@@ -1,18 +1,22 @@
-#include <loader/Loader.h>
 #include "pch.h"
-#include "Config.h"
-#include "LangPack.h"
-#include "Crypt.h"
+#include "BDSWebSocket.h"
+#include "WebSocketServer.h"
+#include <loader/Loader.h>
+#include <mc/Player.h>
 
 using namespace std;
 using namespace Logger;
 
-Config* cfg = nullptr;
-LangPack* lpk = nullptr;
+std::unique_ptr<BDSWebSocket> bdsws;
 
 void entry() {
 	cout << "BDS WebSocket loaded! Author: Jasonzyt" << endl;
-	cfg = Config::read();
-	lpk = new LangPack(PLUGIN_LANGPK, cfg->language);
+	bdsws = std::make_unique<BDSWebSocket>(Config::read());
+	runWebSocketServer(bdsws->cfg->port);
 }
 
+THook(void, Symbol::ServerNetworkHandler_sendLoginMessageLocal, 
+	void* thiz, void* cr, ServerPlayer* sp) {
+	
+	original(thiz, cr, sp);
+}
