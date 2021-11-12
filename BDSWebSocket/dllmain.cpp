@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "WebSocketServer.h"
+#include "BDSWebSocket.h"
 
 BOOL APIENTRY DllMain(
 	HMODULE hModule,
@@ -14,7 +14,7 @@ BOOL APIENTRY DllMain(
 	case DLL_THREAD_DETACH: 
 		break;
 	case DLL_PROCESS_DETACH: {
-		stopWebSocketServer();
+		bdsws->ws->stop();
 		break;
 	}
 	}

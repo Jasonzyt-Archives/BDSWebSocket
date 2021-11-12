@@ -12,7 +12,7 @@ private:
 	nlohmann::json default_lang{
 		{"en", {
 				{"ws.onopen", "WebSocket client connected! Address: %s:%d"},
-				{"ws.onclose", "WebSocket client disconnected! Address: %s:%d"},
+				{"ws.onclose", "WebSocket client disconnected! Address: %s:%d Reason: %s"},
 				{"ws.onerror", "An WebSocket error occurred! Address: %s:%d"},
 				{"ws.onreceived", "Received from %s:%d -> %s"},
 				{"ws.onsent", "Sent to %s:%d -> %s"},
@@ -23,7 +23,7 @@ private:
 		},
 		{"zh-cn", {
 				{"ws.onopen", "WebSocket客户端连接! 地址: %s:%d"},
-				{"ws.onclose", "WebSocket客户端断开连接! 地址: %s:%d"},
+				{"ws.onclose", "WebSocket客户端断开连接! 地址: %s:%d 原因: %s"},
 				{"ws.onerror", "出现了一个WebSocket错误! 客户端地址: %s:%d"},
 				{"ws.onreceived", "收到来自 %s:%d 的消息 -> %s"},
 				{"ws.onsent", "已发送消息至 %s:%d -> %s"},

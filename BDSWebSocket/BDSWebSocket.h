@@ -3,13 +3,7 @@
 #include "pch.h"
 #include "Config.h"
 #include "LangPack.h"
-
-namespace crow {
-	namespace websocket {
-		class connection;
-	}
-}
-class Message;
+#include "WebSocketServer.h"
 
 class BDSWebSocket {
 
@@ -17,14 +11,12 @@ public:
 
 	std::unique_ptr<Config> cfg;
 	std::unique_ptr<LangPack> lpk;
-	// WebSocketServer
-	std::queue<std::function<void(const Message&)>> exec_queue;
-	std::unordered_map<std::string, crow::websocket::connection&> clients;
-	std::mutex ws_mtx;
+	std::unique_ptr<WebSocketServer> ws;
 
 	BDSWebSocket(Config* cfg) {
 		this->cfg.reset(cfg);
 		this->lpk.reset(new LangPack(PLUGIN_LANGPK, cfg->language));
+		this->ws.reset(new WebSocketServer);
 	}
 
 };

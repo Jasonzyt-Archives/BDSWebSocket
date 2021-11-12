@@ -25,7 +25,9 @@ namespace Symbol {
 	// onPlayerDeath
 	// void* | ServerPlayer* thiz, const ActorDamageSource&
 	static const constexpr char* Player_die = "?die@Player@@UEAAXAEBVActorDamageSource@@@Z";
-
+	// onServerLevelTick
+	// void | ServerLevel* thiz
+	static const constexpr char* ServerLevel_tick = "?tick@ServerLevel@@UEAAXXZ";
 #elif defined(BDS_LATEST)
 
 	// onPlayerJoin
@@ -48,7 +50,9 @@ namespace Symbol {
 	// onPlayerDeath
 	// void* | ServerPlayer* thiz, const ActorDamageSource&
 	static const constexpr char* Player_die = "?die@Player@@UEAAXAEBVActorDamageSource@@@Z";
-
+	// onServerLevelTick
+	// void | ServerLevel* thiz
+	static const constexpr char* ServerLevel_tick = "?tick@ServerLevel@@UEAAXXZ";
 #else
 	#error "Unknown BDS version"
 #endif

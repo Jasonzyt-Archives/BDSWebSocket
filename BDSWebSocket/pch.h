@@ -20,8 +20,6 @@
 #include <algorithm>
 #include <filesystem>
 
-#define CROW_MAIN
-
 #define BUILD_RELEASE
 #define BDS_1_16
 //#define BDS_LATEST
