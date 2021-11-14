@@ -1,8 +1,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 #include "pch.h"
-#include "mess.h"
 #include "nlohmann/json.hpp"
+
+inline std::string randomString(int len);
 
 class Config {
 	

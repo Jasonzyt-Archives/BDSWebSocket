@@ -1,5 +1,5 @@
 #include "pch.h"
-
+#include "Crypt.h"
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 #include <cryptopp/cryptlib.h>
 #include <cryptopp/hex.h>
@@ -68,11 +68,11 @@ string base64_encode(string const& ori) {
 	return final_base64;
 }
 
-string base64_aes_cbc_encrypt(const string& ori, unsigned char aes_key[], unsigned char aes_iv[]) {
+string base64_aes_cbc_encrypt(const string& ori, const AESKey& ak) {
 
 	string encrypted;
-	CryptoPP::AES::Encryption aesEncryption(aes_key, CryptoPP::AES::DEFAULT_KEYLENGTH);
-	CryptoPP::CBC_Mode_ExternalCipher::Encryption cbcEncryption(aesEncryption, aes_iv);
+	CryptoPP::AES::Encryption aesEncryption(ak.key, CryptoPP::AES::DEFAULT_KEYLENGTH);
+	CryptoPP::CBC_Mode_ExternalCipher::Encryption cbcEncryption(aesEncryption, ak.iv);
 	CryptoPP::StreamTransformationFilter stfEncryptor(cbcEncryption, new CryptoPP::StringSink(encrypted));
 	stfEncryptor.Put(reinterpret_cast<const unsigned char*>(ori.c_str()), ori.length());
 	stfEncryptor.MessageEnd();
@@ -86,7 +86,7 @@ string base64_aes_cbc_encrypt(const string& ori, unsigned char aes_key[], unsign
 	return base64;
 }
 
-string base64_aes_cbc_decrypt(const string& cipher, unsigned char aes_key[], unsigned char aes_iv[]) {
+string base64_aes_cbc_decrypt(const string& cipher, const AESKey& ak) {
 	string decoded_base64;
 	string decrypted;
 	CryptoPP::Base64Decoder decoder;
@@ -94,8 +94,8 @@ string base64_aes_cbc_decrypt(const string& cipher, unsigned char aes_key[], uns
 	decoder.Put(reinterpret_cast<const unsigned char*>(cipher.c_str()), cipher.length());
 	decoder.MessageEnd();
 
-	CryptoPP::AES::Decryption aesDecryption(aes_key, CryptoPP::AES::DEFAULT_KEYLENGTH);
-	CryptoPP::CBC_Mode_ExternalCipher::Decryption cbcDecryption(aesDecryption, aes_iv);
+	CryptoPP::AES::Decryption aesDecryption(ak.key, CryptoPP::AES::DEFAULT_KEYLENGTH);
+	CryptoPP::CBC_Mode_ExternalCipher::Decryption cbcDecryption(aesDecryption, ak.iv);
 	CryptoPP::StreamTransformationFilter stfDecryptor(cbcDecryption, new CryptoPP::StringSink(decrypted));
 	stfDecryptor.Put(reinterpret_cast<const unsigned char*>(decoded_base64.c_str()), decoded_base64.size());
 	stfDecryptor.MessageEnd();
@@ -110,7 +110,7 @@ inline string MD5(const string& src) {
 	hash.Update((const CryptoPP::byte*)&src[0], src.size());
 	buf.resize(hash.DigestSize());
 	hash.Final((CryptoPP::byte*)&buf[0]);
-	StringSource(buf, true, new Redirector(encoder));
+	StringSource ss(buf, true, new Redirector(encoder));
 	return opt;
 }
 

@@ -145,6 +145,7 @@
     <ClInclude Include="BDSWebSocket.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="Crypt.h" />
+    <ClInclude Include="DynamicDependency.h" />
     <ClInclude Include="ExtendedJson.h" />
     <ClInclude Include="LangPack.h" />
     <ClInclude Include="Logger.h" />
@@ -153,6 +154,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Symbols.h" />
     <ClInclude Include="WebSocketServer.h" />
+    <ClInclude Include="WhiteList.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BDSWebSocket.cpp" />

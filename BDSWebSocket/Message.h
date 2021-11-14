@@ -1,6 +1,7 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 #include "pch.h"
+#include "nlohmann/json.hpp"
 
 class RawMessage {
 	
@@ -31,37 +32,18 @@ class Message {
 	
 public:
 
-	class Data {
-
-	public:
-
-		std::unordered_map<std::string, std::unique_ptr<std::string>&> stringData{
-			{"name", name}, {"nick", nick}, {"reason", reason}, {"cmd", cmd}
-		};
-		std::unordered_map< std::string, std::unique_ptr<bool>&> booleanData{
-			{"success", success}, {"isFakePlayer", isFakePlayer}
-		};
-		std::unordered_map<std::string, std::unique_ptr<unsigned long long>&> ullData{
-			{"xuid", xuid}
-		};
-
-		std::unique_ptr<std::string> name;
-		std::unique_ptr<std::string> nick;
-		std::unique_ptr<std::string> reason;
-		std::unique_ptr<std::string> cmd;
-		std::unique_ptr<xuid_t> xuid;
-		std::unique_ptr<bool> success;
-		std::unique_ptr<bool> isFakePlayer;
-	};
+	Message() = default;
 
 	std::string id;
 	std::string event;
 	std::string type;
-	Data data;
+	nlohmann::json data;
 
 	std::string toJson();
 
 	static Message fromJson(const std::string& str);
+
+	std::string encryptJson();
 
 };
 

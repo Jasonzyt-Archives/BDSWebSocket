@@ -9,25 +9,31 @@
       <Filter>WebSocket</Filter>
     </ClInclude>
     <ClInclude Include="ExtendedJson.h">
-      <Filter>Others</Filter>
+      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Logger.h">
-      <Filter>Others</Filter>
+      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Config.h">
-      <Filter>Others</Filter>
+      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Mess.h">
-      <Filter>Others</Filter>
+      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Crypt.h">
       <Filter>WebSocket</Filter>
     </ClInclude>
     <ClInclude Include="LangPack.h">
-      <Filter>Others</Filter>
+      <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="BDSWebSocket.h" />
     <ClInclude Include="Symbols.h" />
+    <ClInclude Include="DynamicDependency.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="WhiteList.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -37,7 +43,7 @@
       <Filter>WebSocket</Filter>
     </ClCompile>
     <ClCompile Include="ExtendedJson.cpp">
-      <Filter>Others</Filter>
+      <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Message.cpp">
       <Filter>WebSocket</Filter>
@@ -54,7 +60,7 @@
     <Filter Include="WebSocket">
       <UniqueIdentifier>{c12609c4-bb30-41dc-8b29-b99950918067}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Others">
+    <Filter Include="Utils">
       <UniqueIdentifier>{a743b310-b364-419d-919c-d7b02ba1f16d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

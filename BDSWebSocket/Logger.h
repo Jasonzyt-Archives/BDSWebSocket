@@ -182,7 +182,7 @@ namespace Logger
     class Error {
     public:
         Error() {
-            std::cout << "[" << GetCurrentDateTimeStr() << " Error] ";
+            std::cout << "[" << GetCurrentDateTimeStr() << " ERROR][BDSWS] ";
         }
 
         Error(const Error&) = delete;
@@ -231,7 +231,7 @@ namespace Logger
     class Fatal {
     public:
         Fatal() {
-            std::cout << "[" << GetCurrentDateTimeStr() << " FATAL] ";
+            std::cout << "[" << GetCurrentDateTimeStr() << " FATAL][BDSWS] ";
         }
 
         Fatal(const Fatal&) = delete;

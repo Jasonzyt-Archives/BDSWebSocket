@@ -1,35 +1,34 @@
 #ifndef LANGPACK_H
 #define LANGPACK_H
 #include "pch.h"
+#include "Mess.h"
 #include "nlohmann/json.hpp"
 
 class LangPack {
-
-private:
 
 	std::string langType;
 	std::unordered_map<std::string, std::string> lang;
 	nlohmann::json default_lang{
 		{"en", {
-				{"ws.onopen", "WebSocket client connected! Address: %s:%d"},
-				{"ws.onclose", "WebSocket client disconnected! Address: %s:%d Reason: %s"},
-				{"ws.onerror", "An WebSocket error occurred! Address: %s:%d"},
-				{"ws.onreceived", "Received from %s:%d -> %s"},
-				{"ws.onsent", "Sent to %s:%d -> %s"},
+				{"ws.onopen", "WebSocket client connected! Address: %s"},
+				{"ws.onclose", "WebSocket client disconnected! Address: %s Reason: %s"},
+				{"ws.onerror", "An WebSocket error occurred! Address: %s"},
+				{"ws.onreceived", "Received from %s -> %s"},
+				{"ws.onsent", "Sent to %s -> %s"},
 				{"ws.onstart", "WebSocket server started! Port: %d"},
 				{"ws.onstop", "WebSocket server stopped!"},
-				{"ws.notallowed", "WebSocket client '%s:%d' tried connecting server, but it isn't in IPWhiteList! Disconnecting..."},
+				{"ws.notallowed", "WebSocket client '%s' tried connecting server, but it isn't in IPWhiteList! Disconnecting..."},
 			}
 		},
 		{"zh-cn", {
-				{"ws.onopen", "WebSocket客户端连接! 地址: %s:%d"},
-				{"ws.onclose", "WebSocket客户端断开连接! 地址: %s:%d 原因: %s"},
-				{"ws.onerror", "出现了一个WebSocket错误! 客户端地址: %s:%d"},
-				{"ws.onreceived", "收到来自 %s:%d 的消息 -> %s"},
-				{"ws.onsent", "已发送消息至 %s:%d -> %s"},
+				{"ws.onopen", "WebSocket客户端连接! 地址: %s"},
+				{"ws.onclose", "WebSocket客户端断开连接! 地址: %s 原因: %s"},
+				{"ws.onerror", "出现了一个WebSocket错误! 客户端地址: %s"},
+				{"ws.onreceived", "收到来自 %s 的消息 -> %s"},
+				{"ws.onsent", "已发送消息至 %s -> %s"},
 				{"ws.onstart", "WebSocket服务器已启动! 启动端口: %d"},
 				{"ws.onstop", "WebSocket服务器已停止!"},
-				{"ws.notallowed", "WebSocket客户端'%s:%d'尝试连接服务器, 但它不在IP白名单中! 断开连接中..."},
+				{"ws.notallowed", "WebSocket客户端'%s'尝试连接服务器, 但它不在IP白名单中! 断开连接中..."},
 			}
 		}
 	};
@@ -59,8 +58,10 @@ private:
 			json = json.parse(oss.str());
 		}
 		catch (nlohmann::detail::exception e) {
-			Logger::Error() << "Error when parse JSON!!! " << e.what() <<
-				" => Content: " << oss.str() << Logger::endl;
+			if (e.id != 101) {
+				Logger::Error() << "Error when parse JSON!!! " << e.what() <<
+					" => Content: " << oss.str() << Logger::endl;
+			}
 			Logger::Info() << "Try rewriting langpack file...\n";
 			writeDefault(fn);
 			if (!default_lang.count(language)) {
