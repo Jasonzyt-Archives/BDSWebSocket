@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Core.h"
 //MCAPI_ACTOR_EXTRA
 class Actor {

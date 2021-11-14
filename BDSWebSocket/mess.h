@@ -67,5 +67,11 @@ inline xuid_t getXuid(Player* pl)
 	return atoll(xuid_str.c_str());
 }
 
+inline ServerPlayer* getServerPlayer(ServerNetworkHandler* thiz, 
+	NetworkIdentifier* ni, unsigned char sid) {
+	return SymCall(Symbol::ServerNetworkHandler::_getServerPlayer, 
+		ServerPlayer*, ServerNetworkHandler*, NetworkIdentifier*, unsigned char)(thiz, ni, sid);
+}
+
 #endif // !MESS_H
 

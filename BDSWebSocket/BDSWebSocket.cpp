@@ -8,8 +8,14 @@ AESKey BDSWebSocket::getAESKey() {
 	auto md5passwd = md5(cfg->password);
 	auto key = md5passwd.substr(0, 16);
 	auto iv = md5passwd.substr(16);
-	std::copy(key.begin(), key.end(), ak.key);
-	std::copy(iv.begin(), iv.end(), ak.iv);
+	for (int i = 0; i < 16; i++) {
+		ak.key[i] = (unsigned char)key[i];
+	}
+	for (int i = 0; i < 16; i++) {
+		ak.iv[i] = (unsigned char)iv[i];
+	}
+	ak.key[16] = '\0';
+	ak.iv[16] = '\0';
 	return ak;
 }
 

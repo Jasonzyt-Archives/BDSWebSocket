@@ -18,9 +18,13 @@ namespace Symbol {
 		SYMBOL _onPlayerLeft =
 			"?_onPlayerLeft@ServerNetworkHandler@@AEAAXPEAVServerPlayer@@_N@Z";
 		// onTextPacket(Chat)
-		// void | void* thiz, NetworkIdentifier*, TextPacket*
+		// void | ServerNetworkHandler* thiz, NetworkIdentifier*, TextPacket*
 		SYMBOL handle_TextPacket =
 			"?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVTextPacket@@@Z";
+		// getServerPlayer
+		// ServerPlayer* | ServerNetworkHandler* thiz, NetworkIdentifier*, unsigned char(ClientSubId)
+		SYMBOL _getServerPlayer = "?_getServerPlayer@ServerNetworkHandler"
+			"@@AEAAPEAVServerPlayer@@AEBVNetworkIdentifier@@E@Z";
 	}
 	namespace MinecraftCommands {
 		// onCommand
@@ -59,6 +63,14 @@ namespace Symbol {
 		// void | ServerInstance* thiz
 		SYMBOL startServerThread = "?startServerThread@ServerInstance@@QEAAXXZ";
 	}
+	namespace RakNetInstance {
+		// getIPv4Port
+		// ushort | RakNetInstance* thiz
+		SYMBOL getIPv4Port = "?getIPv4Port@RakNetInstance@@UEBAGXZ";
+		// getIPv6Port
+		// ushort | RakNetInstance* thiz
+		SYMBOL getIPv6Port = "?getIPv6Port@RakNetInstance@@UEBAGXZ";
+	}
 	namespace WhitelistFile {
 		// onWhitelistReload
 		// FileReadResult(int) | WhitelistFile* thiz
@@ -80,6 +92,10 @@ namespace Symbol {
 		// void | void* thiz, NetworkIdentifier*, TextPacket*
 		SYMBOL handle_TextPacket =
 			"?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVTextPacket@@@Z";
+		// getServerPlayer
+		// ServerPlayer* | ServerNetworkHandler* thiz, NetworkIdentifier*, unsigned char
+		SYMBOL _getServerPlayer = "?_getServerPlayer@ServerNetworkHandler"
+			"@@AEAAPEAVServerPlayer@@AEBVNetworkIdentifier@@E@Z";
 	}
 	namespace MinecraftCommands {
 		// onCommand

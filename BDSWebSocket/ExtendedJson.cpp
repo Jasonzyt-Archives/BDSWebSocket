@@ -19,9 +19,11 @@ void from_json(const nlohmann::json& json, RawMessage& msg) {
 
 void to_json(nlohmann::json& json, const Message& msg) {
 	json = nlohmann::json{
-		{"id", msg.id},
 		{"data", msg.data}
 	};
+	if (!msg.id.empty()) {
+		json["id"] = msg.id;
+	}
 	if (!msg.event.empty()) {
 		json["event"] = msg.event;
 	}

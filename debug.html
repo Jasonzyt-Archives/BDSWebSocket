@@ -1,0 +1,162 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<title>WebSocket Debugger</title>
+	<script src="https://blog-static.cnblogs.com/files/7qin/md5.js"></script>
+	<script src="https://cdn.staticfile.org/crypto-js/4.0.0/crypto-js.min.js"></script>
+	<style>
+		.wsinfo {
+			font-size: 16px;
+			color: rgb(61, 61, 61);
+			margin-bottom: 10px;
+		}
+
+		.wsinfo input {
+			outline: none;
+			width: 160px;
+			height: 28px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			padding: 0 10px;
+			font-size: 12px;
+		}
+
+		.wsinfo button {
+			outline: none;
+			width: 100px;
+			height: 28px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+		}
+
+		.wsoutput textarea {
+			outline: none;
+			width: 80%;
+			height: 60%;
+			border: 1px solid #ccc;
+		}
+
+		.wssender input {
+			margin-top: 10px;
+			outline: none;
+			width: 80%;
+			height: 28px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			padding: 0 10px;
+			font-size: 12px;
+		}
+	</style>
+</head>
+
+<body style="background-color: rgb(231, 233, 233);">
+	<div class="wsinfo">
+		WebSocket Server Address&nbsp;
+		<input id="addr" type="text" value="127.0.0.1:12344" onchange="onAddrChange"></input>
+	</div>
+	<div class="wsinfo">
+		WebSocket Password&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<input id="passwd" type="text" value="wowow" onchange="onPasswdChange"></input>
+	</div>
+	<div class="wsinfo"><button id="connect" onclick="connect()">Connect</button><button id="disconnect"
+			onclick="disconnect()">Disconnect</button></div>
+	<div class="wsoutput"><textarea id="output" style="font-size: 18px;" readonly></textarea></div>
+	<div class="wssender"><input id="input" type="text" onkeydown="onInputKeyDown(event)"></input></div>
+</body>
+<script>
+	
+	var ws = null;
+	var wsuri = "";
+	let md5key = hex_md5("wowow");
+	let skey = md5key.substring(0, 16);
+	let siv = md5key.substring(16);
+	onAddrChange();
+	onPasswdChange();
+	function textareaAddLine(text) {
+		var textarea = document.getElementById("output");
+		textarea.value += text + "\n";
+		textarea.scrollTop = textarea.scrollHeight;
+	}
+	function connect() {
+		if (ws != null)
+			ws.close();
+		ws = new WebSocket("ws://" + wsuri);
+		ws.onopen = function () {
+			console.log("WebSocket connected!");
+			textareaAddLine("WebSocket connected!");
+		}
+		ws.onerror = function (err) {
+			console.log("WebSocket error: " + JSON.stringify(err));
+			textareaAddLine("WebSocket error: " + JSON.stringify(err));
+		}
+		ws.onmessage = function (msg) {
+			if (msg.data.encrypted) {
+				let plain = decrypt(msg.data.data);
+				textareaAddLine("Received: " + msg.data + "(" + plain +")");
+			} else {
+				console.log(msg.data);
+				textareaAddLine("Received: " + msg.data);
+			}
+		}
+		ws.onclose = function () {
+			console.log("WebSocket disconnected!");
+			textareaAddLine("WebSocket disconnected!");
+		}
+	}
+	function disconnect() {
+		ws.close();
+	}
+	function onAddrChange() {
+		wsuri = document.getElementById("addr").value;
+		textareaAddLine("WebSocket URI Modified: " + wsuri);
+	}
+	function onPasswdChange() {
+		md5key = hex_md5(document.getElementById("passwd").value);
+		skey = md5key.substring(0, 16);
+		siv = md5key.substring(16);
+		textareaAddLine("WebSocket Password Modified: " + skey + ' ' + siv);
+	}
+	function onInputKeyDown(event) {
+		if (event.keyCode == 13) {
+			WS_Send(document.querySelector("#input").value);
+		}
+	}
+	function WS_Send(data) {
+		if (ws != null && ws.readyState == WebSocket.OPEN) {
+			let cipher = encrypt(data);
+			let text = JSON.stringify({ encrypted: true, mode: "AES/CBC/PKCS7Padding", data: cipher });
+			ws.send(text);
+			textareaAddLine("Sent: " + text);
+		} else {
+			console.log("WebSocket is not open.");
+			textareaAddLine("WebSocket is not open.");
+		}
+	}
+	function parse(string) {
+        return CryptoJS.enc.Utf8.parse(string);
+    }
+    function encrypt(data) {
+        // Encrypt
+        return CryptoJS.AES.encrypt(parse(data), parse(skey), {
+            iv: parse(siv),
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        }).toString();
+    }
+    function decrypt(code) {
+        return CryptoJS.AES.decrypt(code, parse(skey),{
+            iv: parse(siv),
+            mode: CryptoJS.mode.CBC,
+            padding: CryptoJS.pad.Pkcs7
+        }).toString(CryptoJS.enc.Utf8);
+    }
+	function base64_encode(str) {
+		return CryptoJS.enc.Base64.stringify(str);
+	}
+	function base64_decode(str) {
+		return CryptoJS.enc.Base64.parse(str).toString();
+	}
+	</script>
+
+</html>

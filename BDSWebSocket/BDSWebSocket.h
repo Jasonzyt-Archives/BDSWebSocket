@@ -22,6 +22,8 @@ public:
 	Level* level = nullptr;
 	Minecraft* mc = nullptr;
 	void* wlfile = nullptr;
+	uint16_t ipv4Port = 0;
+	uint16_t ipv6Port = 0;
 
 	BDSWebSocket(Config* cfg);
 

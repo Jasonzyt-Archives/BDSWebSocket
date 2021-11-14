@@ -7,12 +7,12 @@ class Message;
 class WebSocketServer {
 	
 	bool is_running = false;
-	std::queue<std::function<void()>> exec_queue;
+	std::queue<std::function<void()>> tasks;
 	std::unordered_map<std::string, crow::websocket::connection&> clients;
 	std::mutex mtx;
 	crow::SimpleApp app;
 
-	void parseMessage(const Message& msg);
+	void parseMessage(crow::websocket::connection& conn, Message* msgp);
 
 public:
 
@@ -25,7 +25,7 @@ public:
 
 	bool isRunning();
 
-	void processQueue();
+	void processTask();
 };
 
 #endif // !WEBSOCKETSERVER_H

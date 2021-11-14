@@ -43,6 +43,7 @@ public:
 		if (!xuid.empty()) plInfo["xuid"] = xuid;
 		wl.push_back(plInfo);
 		write(wl);
+		Logger::Info() << "Whitelist added {" << name << ", " << xuid << ", " << ignoresLimit << "}\n";
 		return *this;
 	}
 	inline WhiteList& add(const std::string& name, xuid_t xuid = 0, bool ignoresLimit = false) {
@@ -54,14 +55,19 @@ public:
 	inline WhiteList& remove(const std::string& name) {
 		auto wl = read();
 		int pos = 0;
+		bool found = false;
 		for (auto& plInfo : wl) {
 			if (plInfo.at("name").get<std::string>() == name) {
+				found = true;
 				break;
 			}
 			pos++;
 		}
+		if (!found) 
+			throw std::exception(("Couldn't find " + name + " in whitelist!").c_str());
 		wl.erase(pos);
 		write(wl);
+		Logger::Info() << "Whitelist removed {" << name << "}\n";
 		return *this;
 	}
 
@@ -69,14 +75,19 @@ public:
 		auto wl = read();
 		auto xuidstr = std::to_string(xuid);
 		int pos = 0;
+		bool found = false;
 		for (auto& plInfo : wl) {
 			if (plInfo.at("xuid").get<std::string>() == xuidstr) {
+				found = true;
 				break;
 			}
 			pos++;
 		}
+		if (!found)
+			throw std::exception(("Couldn't find " + xuidstr + " in whitelist!").c_str());
 		wl.erase(pos);
 		write(wl);
+		Logger::Info() << "Whitelist removed {" << xuid << "}\n";
 		return *this;
 	}
 
