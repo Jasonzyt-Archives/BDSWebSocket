@@ -25,19 +25,22 @@ Message Message::fromJson(const std::string& str) {
 Message* Message::fromJsonToPtr(const std::string& str) {
 	auto msg = new Message;
 	auto json = nlohmann::json::parse(str);
+	if (json.count("data")) {
+		msg->data = json.at("data");
+	}
+
 	if (json.count("id")) {
-		msg->id = json.at("id").get<std::string>();
+		msg->id = json.at("id");
 	}
 	if (json.count("type")) {
-		msg->type = json.at("type").get<std::string>();
+		msg->type = json.at("type");
 	}
 	else if (json.count("event")) {
-		msg->event = json.at("event").get<std::string>();
+		msg->event = json.at("event");
 	}
 	else {
 		throw std::exception("Messages must have key-value 'event' or 'type'");
 	}
-	msg->data = json.at("data");
 	return msg;
 }
 

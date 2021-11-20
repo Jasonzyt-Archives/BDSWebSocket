@@ -41,11 +41,15 @@
 			margin-top: 10px;
 			outline: none;
 			width: 80%;
-			height: 28px;
+			height: 32px;
 			border: 1px solid #ccc;
 			border-radius: 5px;
 			padding: 0 10px;
-			font-size: 12px;
+			font-size: 16px;
+		}
+
+		#disconnect {
+			margin-left: 10px;
 		}
 	</style>
 </head>
@@ -59,8 +63,9 @@
 		WebSocket Password&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<input id="passwd" type="text" value="wowow" onchange="onPasswdChange"></input>
 	</div>
-	<div class="wsinfo"><button id="connect" onclick="connect()">Connect</button><button id="disconnect"
-			onclick="disconnect()">Disconnect</button></div>
+	<div class="wsinfo">
+		<button id="connect" onclick="connect()">Connect</button>
+		<button id="disconnect" onclick="disconnect()">Disconnect</button></div>
 	<div class="wsoutput"><textarea id="output" style="font-size: 18px;" readonly></textarea></div>
 	<div class="wssender"><input id="input" type="text" onkeydown="onInputKeyDown(event)"></input></div>
 </body>
@@ -71,6 +76,7 @@
 	let md5key = hex_md5("wowow");
 	let skey = md5key.substring(0, 16);
 	let siv = md5key.substring(16);
+	let history = [];
 	onAddrChange();
 	onPasswdChange();
 	function textareaAddLine(text) {
@@ -87,11 +93,11 @@
 			textareaAddLine("WebSocket connected!");
 		}
 		ws.onerror = function (err) {
-			console.log("WebSocket error: " + JSON.stringify(err));
-			textareaAddLine("WebSocket error: " + JSON.stringify(err));
+			textareaAddLine('WebSocket error!(See console)');
+			console.log(err);
 		}
 		ws.onmessage = function (msg) {
-			if (msg.data.encrypted) {
+			if (JSON.parse(msg.data).encrypted) {
 				let plain = decrypt(msg.data.data);
 				textareaAddLine("Received: " + msg.data + "(" + plain +")");
 			} else {
@@ -117,9 +123,39 @@
 		siv = md5key.substring(16);
 		textareaAddLine("WebSocket Password Modified: " + skey + ' ' + siv);
 	}
+	let now = -1;
 	function onInputKeyDown(event) {
 		if (event.keyCode == 13) {
-			WS_Send(document.querySelector("#input").value);
+			let text = document.getElementById("input").value;
+			history.push(text);
+			now = -1;
+			document.getElementById("input").value = "";
+			WS_Send(text);
+		}
+		else if (event.keyCode == 38) {
+			if (history.length > 0) {
+				if (now == -1) {
+					now = history.length - 1;
+				} else if (now > 0) {
+					now--;
+				}
+				document.getElementById("input").value = history[now];
+			}
+		}
+		else if (event.keyCode == 40) {
+			if (history.length > 0) {
+				if (now == -1) {
+					return;
+				} else if (now < history.length - 1) {
+					now++;
+				}
+				else {
+					now = -1;
+					document.getElementById("input").value = "";
+					return;
+				}
+				document.getElementById("input").value = history[now];
+			}
 		}
 	}
 	function WS_Send(data) {

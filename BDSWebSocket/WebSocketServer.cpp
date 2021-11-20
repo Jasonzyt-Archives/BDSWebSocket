@@ -7,23 +7,41 @@
 #include "LangPack.h"
 #include "BDSWebSocket.h"
 #include "WhiteList.h"
+#include "ExtendedJson.h"
+#include "cryptopp/cryptlib.h"
 
 #define element_exists(vec,val) (find(vec.begin(), vec.end(), val) != vec.end())
 #define H do_hash
 #define RESPONSE Message response; response.type = msgp->type; response.id = msgp->id
 #define RESPOND this->send(conn, RawMessage(response.encryptJson()).toJson())
-#define CATCHERR \
-catch (std::exception e) { \
-	response.data["success"] = false; \
-	response.data["reason"] = e.what(); \
-} catch (...) { \
-	response.data["success"] = false; \
-	response.data["reason"] = "Unknown exception!";\
-}
 #define CASE(x) case H(x)
 #define OPTIONAL(x,y) if (msgp->data.count(x)) y = msgp->data.at(x)
 #define RELEASE_MSG delete msgp
 #define SET_SUCCESS response.data["success"] = true
+#define ARGUMENT(x) msgp->data.at(x)
+#define DATA response.data
+#define CHECK_ARGS(...) \
+for (auto& k : std::vector<std::string>{ __VA_ARGS__ }) { \
+	if (!msgp->data.count(k)) \
+		throw buildException("!WSMessage! Can't find argument '", k, "'"); \
+}
+#define CATCHERR \
+catch (nlohmann::detail::exception e) { \
+	Error() << e.what() << endl; \
+	DATA["success"] = false; \
+	DATA["reason"] = e.what(); \
+} catch (CryptoPP::Exception e) { \
+	Error() << e.what() << endl; \
+	DATA["success"] = false; \
+	DATA["reason"] = e.what(); \
+} catch (std::exception e) { \
+	Error() << e.what() << endl; \
+	DATA["success"] = false; \
+	DATA["reason"] = e.what(); \
+} catch (...) { \
+	DATA["success"] = false; \
+	DATA["reason"] = "Unknown exception!"; \
+}
 
 using namespace std;
 using namespace Logger;
@@ -36,7 +54,8 @@ void WebSocketServer::parseMessage(websocket::connection& conn, Message* msgp) {
 		tasks.push([&]() {
 			RESPONSE;
 			try {
-				Info() << msgp->data.at("text").get<string>() << endl;
+				CHECK_ARGS("text");
+				Info() << ARGUMENT("text").get<string>() << endl;
 				SET_SUCCESS;
 			}
 			CATCHERR;
@@ -61,11 +80,12 @@ void WebSocketServer::parseMessage(websocket::connection& conn, Message* msgp) {
 		tasks.push([&]() {
 			RESPONSE;
 			try {
+				CHECK_ARGS("name");
 				xuid_t xid = 0;
 				bool ignores = false;
 				OPTIONAL("xuid", xid);
 				OPTIONAL("ignoresPlayerLimit", ignores);
-				WhiteList().add(msgp->data.at("name"), xid, ignores).reload();
+				WhiteList().add(ARGUMENT("name"), xid, ignores).reload();
 				SET_SUCCESS;
 			}
 			CATCHERR;
@@ -83,7 +103,61 @@ void WebSocketServer::parseMessage(websocket::connection& conn, Message* msgp) {
 				OPTIONAL("xuid", xid);
 				OPTIONAL("name", name);
 				if (xid > 0) WhiteList().remove(xid).reload();
-				else WhiteList().remove(name).reload();
+				else if (!name.empty()) WhiteList().remove(name).reload();
+				else throw 
+					std::exception("At least one of 'name' and 'xuid' is required as a parameter");
+				SET_SUCCESS;
+			}
+			CATCHERR;
+			RESPOND;
+			RELEASE_MSG;
+		});
+		break;
+	}
+	CASE("listWhitelist"): {
+		tasks.push([&]() {
+			RESPONSE;
+			try {
+				auto ls = WhiteList().list();
+				for (auto& [name, xid] : ls) {
+					DATA["list"].push_back(
+						nlohmann::json{ {"name", name}, {"xuid", xid}});
+				}
+				SET_SUCCESS;
+			}
+			CATCHERR;
+			RESPOND;
+			RELEASE_MSG;
+		});
+		break;
+	} 
+	CASE("getPerformanceUsages"): {
+		tasks.push([&]() {
+			RESPONSE;
+			try {
+				// Disk Usage
+				auto dinfo = GetLogicalDrives();
+				int diskNum = 0;
+				while (dinfo) {
+					if (dinfo & 1) diskNum++;
+					dinfo >>= 1;
+				}
+				auto len = GetLogicalDriveStringsA(0, 0);
+				if (!len) throw std::exception("Error when trying getting the disk information");
+				char* str = new char[(size_t)len + 10]{0};
+				GetLogicalDriveStringsA(len, str);
+				auto diskNames = split(string(str), '\0');
+				diskNames.pop_back();
+				for (auto& diskName : diskNames) {
+					Info() << diskName << endl;
+					DATA["disks"][diskName.substr(0, 1)] = getDiskUsage(diskName[0]);
+				}
+				// Memory Usage
+				DATA["memory"] = getMemoryUsage();
+				DATA["BDSMemory"] = getCurrentProcessMemoryUsage();
+				// CPU Usage
+				DATA["cpu"] = getCpuUsage();
+				DATA["BDSCpu"] = getCurrentProcessCpuUsage();
 				SET_SUCCESS;
 			}
 			CATCHERR;
@@ -155,9 +229,22 @@ void WebSocketServer::run(unsigned short port) {
 					parseMessage(conn, msg);
 				}
 			}
+			catch (nlohmann::detail::exception e) {
+				Error() << e.what() << endl;
+				nlohmann::json resp{ {"type", "error"}, 
+					{"data", { {"reason", e.what()} }} };
+				send(conn, RawMessage(resp.dump(), false).toJson());
+			}
+			catch (CryptoPP::Exception e) {
+				Error() << e.what() << endl;
+				nlohmann::json resp{ {"type", "error"}, 
+					{"data", { {"reason", e.what()} }} };
+				send(conn, RawMessage(resp.dump(), false).toJson());
+			}
 			catch (std::exception e) {
 				Error() << e.what() << endl;
-				nlohmann::json resp{ {"type", "error"}, {"data", {"reason", e.what()}} };
+				nlohmann::json resp{ {"type", "error"}, 
+					{"data", { {"reason", e.what()} }} };
 				send(conn, RawMessage(resp.dump(), false).toJson());
 			}
 		});
@@ -165,9 +252,9 @@ void WebSocketServer::run(unsigned short port) {
 	app.loglevel(LogLevel::Warning);
 
 	thread th([&](unsigned short pt) {
-		app.port(pt).multithreaded().run();
 		is_running = true;
 		Info() << bdsws->lpk->localization("ws.onstart", pt) << endl;
+		app.port(pt).multithreaded().run();
 	}, port);
 	th.detach();
 }
