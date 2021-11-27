@@ -184,8 +184,7 @@ inline std::vector<Player*> getAllPlayers() {
 	return player_list;
 }
 
-inline Certificate* getCert(Player* pl)
-{
+inline Certificate* getCert(Player* pl) {
 #if defined(BDS_1_16)
 	return dAccess<Certificate*, 2736>(pl);
 #elif defined(BDS_LATEST)
@@ -195,11 +194,18 @@ inline Certificate* getCert(Player* pl)
 #error "BDS version is wrong"
 #endif
 }
-inline xuid_t getXuid(Player* pl)
-{
+inline xuid_t getXuid(Player* pl) {
 	std::string xuid_str = SymCall(Symbol::ExtendedCertificate::getXuid,
 		std::string, void*)(getCert(pl));
 	return atoll(xuid_str.c_str());
+}
+inline std::string getRealName(Player* pl) {
+	return SymCall(Symbol::ExtendedCertificate::getIdentityName,
+		std::string, void*)(getCert(pl));
+}
+inline std::string getClientAddress(NetworkIdentifier* nid) {
+	return SymCall(Symbol::NetworkIdentifier::getAddress, 
+		std::string, NetworkIdentifier*)(nid);
 }
 
 inline ServerPlayer* getServerPlayer(ServerNetworkHandler* thiz, 

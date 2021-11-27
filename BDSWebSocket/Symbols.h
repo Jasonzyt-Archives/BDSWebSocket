@@ -17,6 +17,7 @@ namespace Symbol {
 		// void | ServerNetworkHandler* thiz, ServerPlayer*, bool
 		SYMBOL _onPlayerLeft =
 			"?_onPlayerLeft@ServerNetworkHandler@@AEAAXPEAVServerPlayer@@_N@Z";
+		// Real function name: ServerNetworkHandler::handle
 		// onTextPacket(Chat)
 		// void | ServerNetworkHandler* thiz, NetworkIdentifier*, TextPacket*
 		SYMBOL handle_TextPacket =
@@ -29,8 +30,30 @@ namespace Symbol {
 	namespace MinecraftCommands {
 		// onCommand
 		// bool | MinecraftCommands* thiz, unsigned int*, std::shared_ptr<CommandContext>, char
-		SYMBOL executeCommand =
-			"?executeCommand@MinecraftCommands@@QEBA?AUMCRESULT@@V?$shared_ptr@VCommandContext@@@std@@_N@Z";
+		SYMBOL executeCommand = "?executeCommand@MinecraftCommands@@QEBA?AUMCRESULT@"
+			"@V?$shared_ptr@VCommandContext@@@std@@_N@Z";
+	}
+	namespace ConnectionRequest {
+		// getClientPlatformId
+		// __int64(???) | ConnectionRequest* thiz
+		SYMBOL getClientPlatformId = "?getClientPlatformId@ConnectionRequest@@QEBA?AV"
+			"?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ";
+		// getClientPlatformOnlineId
+		// std::string | ConnectionRequest* thiz
+		SYMBOL getClientPlatformOnlineId = "?getClientPlatformOnlineId@ConnectionRequest"
+			"@@QEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ";
+		// getDeviceId
+		// std::string | ConnectionRequest* thiz
+		SYMBOL getDeviceId = "?getDeviceId@ConnectionRequest@@QEBA?AV?$basic_string@DU?"
+			"$char_traits@D@std@@V?$allocator@D@2@@std@@XZ";
+		// getSkinData
+		// std::vector<unsigned char> | ConnectionRequest* thiz
+		SYMBOL getSkinData = "?getSkinData@ConnectionRequest@@QEBA?AV?$vector@EV?$"
+			"allocator@E@std@@@std@@XZ";
+		// getCapeData
+		// std::vector<unsigned char> | ConnectionRequest* thiz
+		SYMBOL getCapeData = "?getCapeData@ConnectionRequest@@QEBA?AV?$vector@EV?$"
+			"allocator@E@std@@@std@@XZ";
 	}
 	namespace Player {
 		// onPlayerDeath
@@ -52,11 +75,23 @@ namespace Symbol {
 		// void | Minecraft* thiz
 		SYMBOL initAsDedicatedServer = "?initAsDedicatedServer@Minecraft@@QEAAXXZ";
 	}
+	namespace NetworkIdentifier {
+		// getClientAddress
+		// std::string | NetworkIdentifier* thiz
+		SYMBOL getAddress = "?getAddress@NetworkIdentifier@@QEBA?AV?$basic_string@DU?$char_"
+			"traits@D@std@@V?$allocator@D@2@@std@@XZ";
+	}
 	namespace ExtendedCertificate {
+		// Static function
 		// getXuid
-		// std::string | ExtendedCertificate* thiz
+		// std::string | Certificate*
 		SYMBOL getXuid = "?getXuid@ExtendedCertificate@@SA?AV?$basic_string@DU?$char_traits"
 			"@D@std@@V?$allocator@D@2@@std@@AEBVCertificate@@@Z";
+		// Static function
+		// getIdentityName(RealName or XboxName)
+		// std::string | Certificate*
+		SYMBOL getIdentityName = "?getIdentityName@ExtendedCertificate@@SA?AV?$basic_string@"
+			"DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AEBVCertificate@@@Z";
 	}
 	namespace ServerInstance {
 		// onServerThreadsStart
@@ -70,6 +105,12 @@ namespace Symbol {
 		// getIPv6Port
 		// ushort | RakNetInstance* thiz
 		SYMBOL getIPv6Port = "?getIPv6Port@RakNetInstance@@UEBAGXZ";
+	}
+	namespace PropertiesSettings {
+		// onPropertiesSettingsConstruct
+		// void | PropertiesSettings* thiz, const std::string&
+		SYMBOL PropertiesSettings = "??0PropertiesSettings@@QEAA@AEBV?$basic_string@DU?"
+			"$char_traits@D@std@@V?$allocator@D@2@@std@@@Z";
 	}
 	namespace WhitelistFile {
 		// onWhitelistReload
@@ -141,6 +182,20 @@ namespace Symbol {
 		// onServerThreadsStart
 		// void | ServerInstance* thiz
 		SYMBOL startServerThread = "?startServerThread@ServerInstance@@QEAAXXZ";
+	}
+	namespace RakNetInstance {
+		// getIPv4Port
+		// ushort | RakNetInstance* thiz
+		SYMBOL getIPv4Port = "?getIPv4Port@RakNetInstance@@UEBAGXZ";
+		// getIPv6Port
+		// ushort | RakNetInstance* thiz
+		SYMBOL getIPv6Port = "?getIPv6Port@RakNetInstance@@UEBAGXZ";
+	}
+	namespace PropertiesSettings {
+		// onPropertiesSettingsConstruct
+		// void | PropertiesSettings* thiz, const std::string&
+		SYMBOL PropertiesSettings = "??0PropertiesSettings@@QEAA@AEBV?$basic_string@DU?"
+			"$char_traits@D@std@@V?$allocator@D@2@@std@@@Z";
 	}
 	namespace WhitelistFile {
 		// onWhitelistReload

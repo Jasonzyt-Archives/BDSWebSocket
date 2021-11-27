@@ -7,7 +7,10 @@
 struct AESKey;
 class LangPack;
 class Level;
+class Player;
 class Minecraft;
+class PropertiesSettings;
+class NetworkIdentifier;
 
 class BDSWebSocket {
 
@@ -24,6 +27,8 @@ public:
 	void* wlfile = nullptr;
 	uint16_t ipv4Port = 0;
 	uint16_t ipv6Port = 0;
+	PropertiesSettings* properties = nullptr;
+	std::unordered_map<Player*, NetworkIdentifier*> nid;
 
 	BDSWebSocket(Config* cfg);
 
