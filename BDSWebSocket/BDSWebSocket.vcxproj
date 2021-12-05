@@ -149,11 +149,14 @@
     <ClInclude Include="ExtendedJson.h" />
     <ClInclude Include="LangPack.h" />
     <ClInclude Include="Logger.h" />
-    <ClInclude Include="mc\ConnectionRequest.h" />
+    <ClInclude Include="mc\TextPacket.h" />
     <ClInclude Include="Mess.h" />
     <ClInclude Include="Message.h" />
+    <ClInclude Include="onMessage.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Symbols.h" />
+    <ClInclude Include="System.h" />
+    <ClInclude Include="WebSocketLogger.h" />
     <ClInclude Include="WebSocketServer.h" />
     <ClInclude Include="WhiteList.h" />
   </ItemGroup>
@@ -165,6 +168,7 @@
     <ClCompile Include="mc\PropertiesSettings.h" />
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="mod.cpp" />
+    <ClCompile Include="onMessage.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="WebSocketServer.cpp" />
   </ItemGroup>

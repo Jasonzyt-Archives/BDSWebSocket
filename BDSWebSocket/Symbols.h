@@ -24,8 +24,14 @@ namespace Symbol {
 			"?handle@ServerNetworkHandler@@UEAAXAEBVNetworkIdentifier@@AEBVTextPacket@@@Z";
 		// getServerPlayer
 		// ServerPlayer* | ServerNetworkHandler* thiz, NetworkIdentifier*, unsigned char(ClientSubId)
-		SYMBOL _getServerPlayer = "?_getServerPlayer@ServerNetworkHandler"
-			"@@AEAAPEAVServerPlayer@@AEBVNetworkIdentifier@@E@Z";
+		SYMBOL _getServerPlayer = "?_getServerPlayer@ServerNetworkHandler@@AEAAPEAV"
+			"ServerPlayer@@AEBVNetworkIdentifier@@E@Z";
+	}
+	namespace NetworkHandler {
+		// getNetworkPeerForUser
+		// NetworkPeer* | NetworkHandler* thiz, NetworkIdentifier*
+		SYMBOL getPeerForUser = "?getPeerForUser@NetworkHandler@@QEAAPEAVNetwork"
+			"Peer@@AEBVNetworkIdentifier@@@Z";
 	}
 	namespace MinecraftCommands {
 		// onCommand
@@ -54,6 +60,16 @@ namespace Symbol {
 		// std::vector<unsigned char> | ConnectionRequest* thiz
 		SYMBOL getCapeData = "?getCapeData@ConnectionRequest@@QEBA?AV?$vector@EV?$"
 			"allocator@E@std@@@std@@XZ";
+		// getData
+		// Json::Value | ConnectionRequest* thiz, std::string
+		SYMBOL getData = "?getData@ConnectionRequest@@AEBA?AVValue@Json@@AEBV?$basic_string"
+			"@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z";
+	}
+	namespace WebToken {
+		// toString
+		// std::string | WebToken* thiz
+		SYMBOL toString = "?toString@WebToken@@QEBA?AV?$basic_string@DU?$char_traits@D@std"
+			"@@V?$allocator@D@2@@std@@XZ";
 	}
 	namespace Player {
 		// onPlayerDeath
@@ -116,6 +132,17 @@ namespace Symbol {
 		// onWhitelistReload
 		// FileReadResult(int) | WhitelistFile* thiz
 		SYMBOL reload = "?reload@WhitelistFile@@QEAA?AW4FileReadResult@@XZ";
+	}
+	namespace Json {
+		namespace Value {
+			// toString
+			// std::string | Json::Value thiz, std::string
+			SYMBOL asString = "?asString@Value@Json@@QEBA?AV?$basic_string@DU?$char_traits"
+				"@D@std@@V?$allocator@D@2@@std@@AEBV34@@Z";
+			// toInt
+			// int | Json::Value thiz, int
+			SYMBOL asInt = "?asInt@Value@Json@@QEBAHH@Z";
+		}
 	}
 #elif defined(BDS_LATEST)
 

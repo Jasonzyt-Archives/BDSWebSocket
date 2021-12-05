@@ -23,13 +23,9 @@ BDSWebSocket::BDSWebSocket(Config* cfg) {
 	this->cfg.reset(cfg);
 	this->lpk.reset(new LangPack(PLUGIN_LANGPK, cfg->language));
 	this->ws.reset(new WebSocketServer);
-	logfile.open(WEBSOCKET_LOG, std::ios::out | std::ios::app);
-	logfile << "==================== PLUGIN STARTED ====================\n";
-	logfile << "BuildTime: " << __DATE__ " " __TIME__ << std::endl;
-	logfile << "Version: " << VERSIONSTR << std::endl;
+	gcu.init();
+	cpcu.init();
 }
 
 BDSWebSocket::~BDSWebSocket() {
-	logfile << "==================== PLUGIN STOPPED ====================\n\n";
-	logfile.close();
 }

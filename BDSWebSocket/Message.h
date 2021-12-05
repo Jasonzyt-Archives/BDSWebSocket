@@ -1,7 +1,7 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
-#include "pch.h"
-#include "nlohmann/json.hpp"
+#include <string>
+#include <nlohmann/json.hpp>
 
 class RawMessage {
 	

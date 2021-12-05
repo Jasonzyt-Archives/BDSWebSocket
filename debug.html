@@ -23,11 +23,15 @@
 		}
 
 		.wsinfo button {
+			margin-left: 10px;
 			outline: none;
 			width: 100px;
 			height: 28px;
 			border: 1px solid #ccc;
 			border-radius: 5px;
+		}
+		.wsinfo button:hover {
+			background-color: #fff;
 		}
 
 		.wsoutput textarea {
@@ -48,8 +52,8 @@
 			font-size: 16px;
 		}
 
-		#disconnect {
-			margin-left: 10px;
+		#connect {
+			margin-left: 0;
 		}
 	</style>
 </head>
@@ -57,32 +61,122 @@
 <body style="background-color: rgb(231, 233, 233);">
 	<div class="wsinfo">
 		WebSocket Server Address&nbsp;
-		<input id="addr" type="text" value="127.0.0.1:12344" onchange="onAddrChange"></input>
+		<input id="addr" type="text" value="" onkeydown="onAddrChange(event)"></input>
 	</div>
 	<div class="wsinfo">
 		WebSocket Password&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<input id="passwd" type="text" value="wowow" onchange="onPasswdChange"></input>
+		<input id="passwd" type="text" value="" onkeydown="onPasswdChange(event)"></input>
 	</div>
 	<div class="wsinfo">
 		<button id="connect" onclick="connect()">Connect</button>
-		<button id="disconnect" onclick="disconnect()">Disconnect</button></div>
+		<button id="disconnect" onclick="disconnect()">Disconnect</button>
+		<button id="clear" onclick="storage.set('history','[]');history = [];">Clear History</button>
+	</div>
 	<div class="wsoutput"><textarea id="output" style="font-size: 18px;" readonly></textarea></div>
 	<div class="wssender"><input id="input" type="text" onkeydown="onInputKeyDown(event)"></input></div>
 </body>
 <script>
-	
+	function init_storage() {
+        var ms = "WebSocketDebugger";
+        var storage = window.localStorage;
+        if(!window.localStorage){
+            alert("浏览器不支持localstorage");
+            return false;
+        }
+        //存储方法
+        var set = function(key,value){
+            var mydata = storage.getItem(ms);
+            if(!mydata){
+                this.init();
+                mydata = storage.getItem(ms);
+            }
+            mydata = JSON.parse(mydata);
+            mydata.data[key] = value;
+            storage.setItem(ms,JSON.stringify(mydata));
+            return mydata.data;
+        };
+        //读取方法
+        var get = function(key){
+            var mydata = storage.getItem(ms);
+            if(!mydata){
+                return false;
+            }
+            mydata = JSON.parse(mydata);
+            return mydata.data[key];
+        };
+        var remove = function(key){
+            //读取
+            var mydata = storage.getItem(ms);
+            if(!mydata){
+                return false;
+            }
+            mydata = JSON.parse(mydata);
+            delete mydata.data[key];
+            storage.setItem(ms,JSON.stringify(mydata));
+            return mydata.data;
+        };
+        var clear = function(){
+            //清除对象
+            storage.removeItem(ms);
+        };
+        var init = function(){
+            storage.setItem(ms,'{"data":{}}');
+        };
+        return {
+            set : set,
+            get : get,
+            remove : remove,
+            init : init,
+            clear : clear
+        };
+    };
+
+	var storage = init_storage();
 	var ws = null;
 	var wsuri = "";
 	let md5key = hex_md5("wowow");
 	let skey = md5key.substring(0, 16);
 	let siv = md5key.substring(16);
 	let history = [];
-	onAddrChange();
-	onPasswdChange();
+	init();
+	function init() {
+		let addr = storage.get("addr");
+		if (addr != null) {
+			wsuri = addr;
+			document.getElementById("addr").value = addr;
+			textareaAddLine("Set WebSocket Server Address: " + addr);
+		}
+		let passwd = storage.get("passwd");
+		if (passwd != null) {
+			md5key = hex_md5(passwd);
+			skey = md5key.substring(0, 16);
+			siv = md5key.substring(16);
+			document.getElementById("passwd").value = passwd;
+			textareaAddLine("Set WebSocket Server Password: " + passwd);
+		}
+		let _history = storage.get("history");
+		if (_history != null) {
+			history = JSON.parse(_history);
+		}
+	}
 	function textareaAddLine(text) {
 		var textarea = document.getElementById("output");
 		textarea.value += text + "\n";
 		textarea.scrollTop = textarea.scrollHeight;
+	}
+	function prettyPrint(space, obj) {
+		let keys = Object.keys(obj);
+		var str = "";
+		for (let i = 0; i < keys.length; i++) {
+			let key = keys[i];
+			if (typeof obj[key] == "object") {
+				str += space + "- " + key + ": \n";
+				str += prettyPrint(space + "  ", obj[key]);
+			} else {
+				str += space + "- " + key + ": " + obj[key] + "\n";
+			}
+		}
+		return str;
 	}
 	function connect() {
 		if (ws != null)
@@ -98,8 +192,21 @@
 		}
 		ws.onmessage = function (msg) {
 			if (JSON.parse(msg.data).encrypted) {
-				let plain = decrypt(msg.data.data);
-				textareaAddLine("Received: " + msg.data + "(" + plain +")");
+				let plain = decrypt(JSON.parse(msg.data).data);
+				let obj = JSON.parse(plain);
+				//textareaAddLine("Received: " + msg.data + "(" + plain +")");
+				//textareaAddLine("Received: " + plain);
+				textareaAddLine("Received: ");
+				if (obj["id"] != null)
+					textareaAddLine("id: " + obj.id);
+				if (obj["type"] != null)
+					textareaAddLine("type: " + obj.type);
+				if (obj["event"] != null)
+					textareaAddLine("event: " + obj.event);
+				if (obj["data"] != null) {
+					textareaAddLine("data: ");
+					textareaAddLine(prettyPrint("", obj.data));
+				}
 			} else {
 				console.log(msg.data);
 				textareaAddLine("Received: " + msg.data);
@@ -113,21 +220,33 @@
 	function disconnect() {
 		ws.close();
 	}
-	function onAddrChange() {
-		wsuri = document.getElementById("addr").value;
-		textareaAddLine("WebSocket URI Modified: " + wsuri);
+	function onAddrChange(event) {
+		if (event.keyCode == 13) {
+			wsuri = document.getElementById("addr").value;
+			storage.set("addr", wsuri);
+			textareaAddLine("WebSocket Address Modified: " + wsuri);
+		}
 	}
-	function onPasswdChange() {
-		md5key = hex_md5(document.getElementById("passwd").value);
-		skey = md5key.substring(0, 16);
-		siv = md5key.substring(16);
-		textareaAddLine("WebSocket Password Modified: " + skey + ' ' + siv);
+	function onPasswdChange(event) {
+		if (event.keyCode == 13) {
+			let passwd = document.getElementById("passwd").value;
+			storage.set("passwd", passwd);
+			md5key = hex_md5(passwd);
+			skey = md5key.substring(0, 16);
+			siv = md5key.substring(16);
+			textareaAddLine("WebSocket Password Modified: " + skey + ' ' + siv);
+		}
 	}
 	let now = -1;
 	function onInputKeyDown(event) {
 		if (event.keyCode == 13) {
 			let text = document.getElementById("input").value;
+			if (text == "") return;
+			if (history.indexOf(text) != -1) {
+				history.splice(history.indexOf(text), 1);
+			}
 			history.push(text);
+			storage.set("history", JSON.stringify(history));
 			now = -1;
 			document.getElementById("input").value = "";
 			WS_Send(text);

@@ -5,9 +5,11 @@
 class DynDependency {
 
 public:
+	HMODULE handler;
 	std::unordered_map<std::string, FARPROC> func;
 
 	DynDependency(HMODULE handler, std::vector<std::string> names) {
+		this->handler = handler;
 		for (auto& name : names) {
 			auto ptr = GetProcAddress(handler, name.c_str());
 			if (ptr) { 
@@ -28,8 +30,12 @@ public:
 			}
 		}
 		else {
-			Logger::Warn << "Function " << name << " not found!" << Logger::endl;
+			Logger::Warn() << "Function " << name << " not found!" << Logger::endl;
 		}
+	}
+
+	inline bool release() {
+		return FreeLibrary(handler);
 	}
 
 };

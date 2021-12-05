@@ -21,12 +21,13 @@
 #include <filesystem>
 #include <functional>
 
+#undef ERROR
+
 //#define RELEASE
 #define BDS_1_16
 //#define BDS_LATEST
 
 #include "Logger.h"
-#include "Symbols.h"
 
 typedef unsigned long long xuid_t;
 

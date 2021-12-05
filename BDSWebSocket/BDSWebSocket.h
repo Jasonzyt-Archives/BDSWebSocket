@@ -3,14 +3,17 @@
 #include "pch.h"
 #include "Config.h"
 #include "WebSocketServer.h"
+#include "System.h"
 
 struct AESKey;
 class LangPack;
 class Level;
 class Player;
 class Minecraft;
-class PropertiesSettings;
 class NetworkIdentifier;
+
+struct RakPeer_t;
+struct PropertiesSettings;
 
 class BDSWebSocket {
 
@@ -20,7 +23,8 @@ public:
 	std::unique_ptr<Config> cfg;
 	std::unique_ptr<LangPack> lpk;
 	std::unique_ptr<WebSocketServer> ws;
-	std::fstream logfile;
+	GlobalCpuUsage gcu;
+	CurrentProcessCpuUsage cpcu;
 	// MC
 	Level* level = nullptr;
 	Minecraft* mc = nullptr;
@@ -28,6 +32,7 @@ public:
 	uint16_t ipv4Port = 0;
 	uint16_t ipv6Port = 0;
 	PropertiesSettings* properties = nullptr;
+	RakPeer_t* rakpeer = nullptr;
 	std::unordered_map<Player*, NetworkIdentifier*> nid;
 
 	BDSWebSocket(Config* cfg);

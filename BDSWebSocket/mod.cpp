@@ -1,12 +1,16 @@
 #include "pch.h"
+#include "Symbols.h"
 #include "BDSWebSocket.h"
 #include "WebSocketServer.h"
 #include "Message.h"
 #include "Mess.h"
 #include "Crypt.h"
 #include "mc/PropertiesSettings.h"
+#include "mc/TextPacket.h"
 #include <loader/Loader.h>
 #include <mc/Player.h>
+#include <api/commands.h>
+#include <api/Basic_Event.h>
 
 #define EVENT(x) Message ev; ev.event = x
 #define DATA ev.data
@@ -17,20 +21,53 @@ using namespace Logger;
 
 std::unique_ptr<BDSWebSocket> bdsws;
 
+bool onWSDebugCmd(CommandOrigin const& ori, CommandOutput& outp, string str) {
+	bdsws->ws->sendAll(str);
+	return true;
+}
+
 void entry() {
 	Info() << "BDSWebSocket loaded! Author: Jasonzyt" << endl;
 	Info() << "Version: " << VERSIONSTR << " (Build " __DATE__ " " __TIME__ ")" << endl;
 	bdsws = std::make_unique<BDSWebSocket>(Config::read());
 	bdsws->ws->run(bdsws->cfg->port);
+#if !defined(RELEASE)
+	Event::addEventListener([&](RegCmdEV ev) {
+		CMDREG::SetCommandRegistry(ev.CMDRg);
+		MakeCommand("wsdebug", "send a WebSocket message to ALL connected clients",
+			CommandPermissionLevel::ConsoleOnly);
+		CmdOverload(wsdebug, onWSDebugCmd, "message");
+		}
+	);
+#endif
 }
 
 ////////////////////////////////// 功能Hook //////////////////////////////////
+struct JsonValue {
+	char f[16];
+};
 
 THook(void, Symbol::ServerNetworkHandler::sendLoginMessageLocal,
 	void* thiz, NetworkIdentifier* nid, void* cr, ServerPlayer* sp) {
 	EVENT("onPlayerJoin");
+	auto wt = dAccess<void*, 16>(cr);
+	auto data = dAccess<JsonValue, 80>(wt);
+	/*
+	void* val = SymCall("??AValue@Json@@QEAAAEAV01@AEBV?$basic_string@DU?$"
+		"char_traits@D@std@@V?$allocator@D@2@@std@@@Z", void*, void*, 
+		const string&)(wt, "DeviceOS");
+	cout << SymCall(Symbol::Json::Value::asString, string, 
+		void*, const string&)(val, "???") << endl;
+	cout << SymCall(Symbol::Json::Value::asInt, int,
+		void*, int)(val, 100) << endl;*/
+	//cout << SymCall("?toStyledString@Value@Json@@QEBA?AV?$basic_string"
+		//"@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ", string, JsonValue)
+		//(data) << endl;
+	//cout << SymCall("?toString@NetworkIdentifier@@QEBA?AV?$basic_string@DU?$"
+		//"char_traits@D@std@@V?$allocator@D@2@@std@@XZ", string, NetworkIdentifier*)(nid) << endl;
 	DATA["realName"] = getRealName(sp);
 	DATA["address"] = getClientAddress(nid);
+	DATA["ping"] = getAvgPingOfPlayer(nid);
 	DATA["name"] = sp->getNameTag();
 	DATA["xuid"] = getXuid(sp);
 	SEND;
@@ -48,10 +85,15 @@ THook(void, Symbol::ServerNetworkHandler::_onPlayerLeft, void* thiz, ServerPlaye
 	original(thiz, sp);
 }
 
-THook(void, Symbol::ServerNetworkHandler::handle_TextPacket, void* thiz, void* ni, void* tp) {
+THook(void, Symbol::ServerNetworkHandler::handle_TextPacket, ServerNetworkHandler* thiz, 
+	NetworkIdentifier* ni, void* tp) {
 	auto sp = getServerPlayer((ServerNetworkHandler*)thiz, 
 		(NetworkIdentifier*)ni, dAccess<uchar, 16>(tp));
-	auto msg = std::string(*dAccess<std::string*, 88>(tp));
+#if defined(BDS_1_16)
+	auto msg = string(*(string*)((uintptr_t)tp + 80));
+#elif defined(BDS_LATEST)
+	auto msg = string(*(string*)((uintptr_t)tp + 88));
+#endif
 	EVENT("onPlayerChat");
 	DATA["name"] = sp->getNameTag();
 	DATA["xuid"] = getXuid(sp);
@@ -84,6 +126,15 @@ THook(void, Symbol::ServerInstance::startServerThread, void* thiz) {
 }
 
 ////////////////////////////////// 工具Hook //////////////////////////////////
+
+THook(void*, "??0RakPeer@RakNet@@QEAA@XZ", RakPeer_t* thiz) {
+	static bool inited = false;
+	if (!inited) {
+		inited = true;
+		bdsws->rakpeer = thiz;
+	}
+	return original(thiz);
+}
 
 THook(void, Symbol::PropertiesSettings::PropertiesSettings, 
 	PropertiesSettings* thiz, const std::string& file) {

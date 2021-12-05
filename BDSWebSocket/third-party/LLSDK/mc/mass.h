@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include<api/serviceLocate.h>
 #include<loader\Loader.h>
 #include <mc/Core.h>
@@ -97,4 +97,23 @@ public:
 		*((void**)&rv) = dlsym("?getServerNetworkHandler@Minecraft@@QEAAPEAVServerNetworkHandler@@XZ");
 		return (this->*rv)();
 	}
+};
+
+class NetworkPeer {
+public:
+	enum class Reliability : int {};
+	enum class DataStatus : int {
+		OK,
+		BUSY
+	};
+	struct NetworkStatus {
+		int    level;
+		int    ping, avgping;
+		double packetloss, avgpacketloss;
+		char   pkt[64];
+	};
+
+	virtual void          sendPacket(std::string, NetworkPeer::Reliability, int) = 0;
+	virtual DataStatus    receivePacket(std::string&) = 0;
+	virtual NetworkStatus getNetworkStatus() = 0;
 };

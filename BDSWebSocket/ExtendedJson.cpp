@@ -1,6 +1,6 @@
 #include "ExtendedJson.h"
 #include "Message.h"
-#include "Mess.h"
+#include "System.h"
 
 using namespace std;
 
@@ -73,30 +73,24 @@ void to_json(nlohmann::json& json, const MemoryUsage& mu) {
 	json = nlohmann::json{
 		{"physicalUsed", mu.physicalUsed},
 		{"physicalTotal", mu.physicalTotal},
-		{"virtualUse", mu.virtualUsed},
+		{"virtualUsed", mu.virtualUsed},
 		{"virtualTotal", mu.virtualTotal},
-		{"rate", mu.rate}
 	};
 }
 void from_json(const nlohmann::json& json, MemoryUsage& du) {
 	json.at("physicalUsed").get_to(du.physicalUsed);
 	json.at("physicalTotal").get_to(du.physicalTotal);
-	json.at("virtualUse").get_to(du.virtualUsed);
+	json.at("virtualUsed").get_to(du.virtualUsed);
 	json.at("virtualTotal").get_to(du.virtualTotal);
-	json.at("rate").get_to(du.rate);
 }
 
 void to_json(nlohmann::json& json, const CpuUsage& cu) {
 	json = nlohmann::json{
-		{"rate", cu.rate}
+		{"totalRate", cu.total_rate}
 	};
-	if (cu.core > 0) {
-		json["core"] = cu.core;
-	}
+	if (!cu.rate.empty()) json["rate"] = cu.rate;
 }
 void from_json(const nlohmann::json& json, CpuUsage& cu) {
+	json.at("totalRate").get_to(cu.total_rate);
 	json.at("rate").get_to(cu.rate);
-	if (json.count("core")) {
-		json.at("core").get_to(cu.core);
-	}
 }

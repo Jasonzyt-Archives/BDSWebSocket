@@ -6,6 +6,9 @@
 # BDSWebSocket
 RELEASES
 Test.bat
+.vscode
+backup
+golang
 #/BDSWebSocket/lib/cryptopp-static.lib
 
 # User-specific files

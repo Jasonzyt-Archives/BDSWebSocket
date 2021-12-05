@@ -34,8 +34,17 @@
     <ClInclude Include="WhiteList.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="mc\ConnectionRequest.h">
+    <ClInclude Include="mc\TextPacket.h">
       <Filter>MC</Filter>
+    </ClInclude>
+    <ClInclude Include="WebSocketLogger.h">
+      <Filter>WebSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="System.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="onMessage.h">
+      <Filter>WebSocket</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -57,6 +66,9 @@
     <ClCompile Include="BDSWebSocket.cpp" />
     <ClCompile Include="mc\PropertiesSettings.h">
       <Filter>MC</Filter>
+    </ClCompile>
+    <ClCompile Include="onMessage.cpp">
+      <Filter>WebSocket</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

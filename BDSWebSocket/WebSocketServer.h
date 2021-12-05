@@ -3,7 +3,6 @@
 #include "pch.h"
 #include <crow/crow_all.h>
 
-class Message;
 class WebSocketServer {
 	
 	bool is_running = false;
@@ -11,8 +10,9 @@ class WebSocketServer {
 	std::unordered_map<std::string, crow::websocket::connection&> clients;
 	std::mutex mtx;
 	crow::SimpleApp app;
+	time_t start = 0;
 
-	void parseMessage(crow::websocket::connection& conn, Message* msgp);
+	void handle(crow::websocket::connection& conn, class Message* msgp);
 
 public:
 

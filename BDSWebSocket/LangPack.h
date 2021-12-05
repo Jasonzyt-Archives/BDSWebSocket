@@ -13,10 +13,10 @@ class LangPack {
 				{"ws.onopen", "WebSocket client connected! Address: %s"},
 				{"ws.onclose", "WebSocket client disconnected! Address: %s Reason: %s"},
 				{"ws.onerror", "An WebSocket error occurred! Address: %s"},
-				{"ws.onreceived", "Received from %s -> %s"},
+				{"ws.onreceived", "Received from %s <- %s"},
 				{"ws.onsent", "Sent to %s -> %s"},
 				{"ws.onstart", "WebSocket server started! Port: %d"},
-				{"ws.onstop", "WebSocket server stopped!"},
+				{"ws.onstop", "WebSocket server stopped! (Opening time: %s)"},
 				{"ws.notallowed", "WebSocket client '%s' tried connecting server, but it isn't in IPWhiteList! Disconnecting..."},
 			}
 		},
@@ -27,7 +27,7 @@ class LangPack {
 				{"ws.onreceived", "收到来自 %s 的消息 -> %s"},
 				{"ws.onsent", "已发送消息至 %s -> %s"},
 				{"ws.onstart", "WebSocket服务器已启动! 启动端口: %d"},
-				{"ws.onstop", "WebSocket服务器已停止!"},
+				{"ws.onstop", "WebSocket服务器已停止! (持续开启时间: %s)"},
 				{"ws.notallowed", "WebSocket客户端'%s'尝试连接服务器, 但它不在IP白名单中! 断开连接中..."},
 			}
 		}
@@ -55,7 +55,7 @@ class LangPack {
 		}
 
 		try {
-			json = json.parse(oss.str());
+			json = nlohmann::json::parse(oss.str());
 		}
 		catch (nlohmann::detail::exception e) {
 			if (e.id != 101) {
@@ -77,6 +77,25 @@ class LangPack {
 			lang = default_lang.at("en").get<std::unordered_map<std::string, std::string>>();
 			return;
 		}
+		/*
+		bool modified = false;
+		for (auto it = default_lang["en"].begin();
+			it != default_lang.end(); it++) {
+			if (!json.count(it.key())) {
+				modified = true;
+				if (language == "zh-cn") {
+					json.at(language)[it.key()] = default_lang["zh-cn"].at(it.key());
+				}
+				else {
+					json.at(language)[it.key()] = it.value();
+				}
+			}
+		}
+		if (modified) {
+			std::fstream file(fn, std::ios::out | std::ios::ate);
+			file << std::setw(4) << json;
+			file.close();
+		}*/
 		lang = json.at(language).get<std::unordered_map<std::string, std::string>>();
 	}
 
