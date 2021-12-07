@@ -67,7 +67,7 @@ THook(void, Symbol::ServerNetworkHandler::sendLoginMessageLocal,
 		//"char_traits@D@std@@V?$allocator@D@2@@std@@XZ", string, NetworkIdentifier*)(nid) << endl;
 	DATA["realName"] = getRealName(sp);
 	DATA["address"] = getClientAddress(nid);
-	DATA["ping"] = getAvgPingOfPlayer(nid);
+	DATA["ping"] = getPingOfPlayer(nid);
 	DATA["name"] = sp->getNameTag();
 	DATA["xuid"] = getXuid(sp);
 	SEND;

@@ -169,6 +169,7 @@
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="mod.cpp" />
     <ClCompile Include="onMessage.cpp" />
+    <ClCompile Include="optional.h" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="WebSocketServer.cpp" />
   </ItemGroup>

@@ -70,6 +70,9 @@
     <ClCompile Include="onMessage.cpp">
       <Filter>WebSocket</Filter>
     </ClCompile>
+    <ClCompile Include="optional.h">
+      <Filter>Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Lib">

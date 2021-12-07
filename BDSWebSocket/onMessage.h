@@ -18,12 +18,18 @@ struct onMessage {
 
 CALLBACK(ConsoleLog);
 CALLBACK(getPerformanceUsages);
+CALLBACK(addWhiteList);
+CALLBACK(removeWhiteList);
+CALLBACK(getWhiteList);
 
 #undef CALLBACK
 
 const std::unordered_map<std::string, onMessage> onMessages{
-	{"consoleLog", {ConsoleLog, {"text"}, {}}},
-	{"getPerformanceUsages", {getPerformanceUsages, {}, {}}},
+	{"consoleLog", {ConsoleLog, {"text"}}},
+	{"getPerformanceUsages", {getPerformanceUsages}},
+	{"addWhiteList", {addWhiteList, {"name"}}},
+	{"removeWhiteList", {removeWhiteList, {}, {"name", "xuid"}}},
+	{"getWhiteList", {getWhiteList}},
 };
 
 #endif // !ONMESSAGE_H

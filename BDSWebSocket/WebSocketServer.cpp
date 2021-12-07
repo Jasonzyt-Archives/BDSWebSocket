@@ -6,8 +6,6 @@
 #include "Crypt.h"
 #include "LangPack.h"
 #include "BDSWebSocket.h"
-#include "WhiteList.h"
-#include "ExtendedJson.h"
 #include "cryptopp/cryptlib.h"
 
 #define element_exists(vec,val) (find(vec.begin(), vec.end(), val) != vec.end())
@@ -81,7 +79,7 @@ void WebSocketServer::handle(websocket::connection& conn, Message* msgp) {
 				auto req = (msgp->type.empty() ? msgp->event : msgp->type);
 				auto resp_data = onMessages.at(req).cb(conn, msgp);
 				DATA = resp_data;
-				SET_SUCCESS;
+				SET_SUCCESS; // To set error, plz throw an exception in callback
 			}
 			CATCH_ERR;
 			RESPOND;
@@ -95,118 +93,6 @@ void WebSocketServer::handle(websocket::connection& conn, Message* msgp) {
 		RESPOND;
 		RELEASE_MSG;
 	}
-	/*
-	{
-	CASE("consoleLog"): {
-		tasks.push([&]() {
-			RESPONSE;
-			try {
-				CHECK_ARGS("text");
-				Info() << ARGUMENT("text").get<string>() << endl;
-				SET_SUCCESS;
-			}
-			CATCHERR;
-			RESPOND;
-			RELEASE_MSG;
-		});
-		break;
-	}
-	CASE("sendTextPlayer"): {
-		tasks.push([&]() {
-			RELEASE_MSG;
-		});
-		break;
-	}
-	CASE("broadcast"): {
-		tasks.push([&]() {
-			RELEASE_MSG;
-		});
-		break;
-	}
-	CASE("addWhitelist"): {
-		tasks.push([&]() {
-			RESPONSE;
-			try {
-				CHECK_ARGS("name");
-				xuid_t xid = 0;
-				bool ignores = false;
-				OPTIONAL("xuid", xid);
-				OPTIONAL("ignoresPlayerLimit", ignores);
-				WhiteList().add(ARGUMENT("name"), xid, ignores).reload();
-				SET_SUCCESS;
-			}
-			CATCHERR;
-			RESPOND;
-			RELEASE_MSG;
-		});
-		break;
-	}
-	CASE("removeWhitelist"): {
-		tasks.push([&]() {
-			RESPONSE;
-			try {
-				xuid_t xid = 0;
-				string name;
-				OPTIONAL("xuid", xid);
-				OPTIONAL("name", name);
-				if (xid > 0) WhiteList().remove(xid).reload();
-				else if (!name.empty()) WhiteList().remove(name).reload();
-				else throw 
-					std::exception("At least one of 'name' and 'xuid' is required as a parameter");
-				SET_SUCCESS;
-			}
-			CATCHERR;
-			RESPOND;
-			RELEASE_MSG;
-		});
-		break;
-	}
-	CASE("listWhitelist"): {
-		tasks.push([&]() {
-			RESPONSE;
-			try {
-				auto ls = WhiteList().list();
-				for (auto& [name, xid] : ls) {
-					DATA["list"].push_back(
-						nlohmann::json{ {"name", name}, {"xuid", xid}});
-				}
-				SET_SUCCESS;
-			}
-			CATCHERR;
-			RESPOND;
-			RELEASE_MSG;
-		});
-		break;
-	} 
-	CASE("getPerformanceUsages"): {
-		tasks.push([&]() {
-			RESPONSE;
-			try {
-				// Disk Usage
-				auto len = GetLogicalDriveStringsA(0, 0);
-				if (!len) throw std::exception("Error when trying getting the disk information");
-				char* str = new char[len]{0};
-				GetLogicalDriveStringsA(len, str);
-				auto diskNames = split(string(str), '\0');
-				for (auto& diskName : diskNames) {
-					Info() << diskName << endl;
-					DATA["disks"][diskName.substr(0, 1)] = getDiskUsage(diskName[0]);
-				}
-				// Memory Usage
-				DATA["memory"] = getMemoryUsage();
-				DATA["currentProcessMemory"] = getCurrentProcessMemoryUsage();
-				// CPU Usage
-				DATA["cpu"] = getCpuUsage();
-				DATA["currentProcessCpu"] = getCurrentProcessCpuUsage();
-				SET_SUCCESS;
-			}
-			CATCHERR;
-			RESPOND;
-			RELEASE_MSG;
-		});
-		break;
-	}
-	}*/
 }
 
 void WebSocketServer::run(unsigned short port) {
