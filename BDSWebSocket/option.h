@@ -3,15 +3,15 @@
 #include <exception>
 
 template <typename T>
-class optional {
+class option {
 	
 	T _val;
 	bool _set = false;
 
 public:
 
-	optional() {}
-	optional(T v) {
+	option() {}
+	option(T v) {
 		_val = v;
 		_set = true;
 	}
@@ -24,7 +24,7 @@ public:
 		if (_set) {
 			return _val;
 		}
-		throw std::exception("optional: val has not been set");
+		throw std::exception("option: val has not been set");
 	}
 
 	inline T val() { 

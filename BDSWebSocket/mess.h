@@ -6,6 +6,8 @@
 #include <mc/Player.h>
 #include <mc/Certificate.h>
 #include <mc/Level.h>
+#include "mc/Packet.h"
+#include <LLSDK/api/types/types.h>
 
 ////////////////////////////////// UTILS //////////////////////////////////
 
@@ -72,7 +74,60 @@ inline std::exception buildException(Args ... args) {
 
 ////////////////////////////////// MC //////////////////////////////////
 
+namespace mce {
+	class UUID {
+		char filler[16];
+	public:
+		inline std::string asString() {
+			std::string result;
+			SymCall(Symbol::mce::UUID::asString, std::string*, UUID*, std::string*)
+				(this, &result);
+			return result;
+		}
+	};
+}
+
+enum ActorDamageCause : int
+{
+	Override = 0x0,          // 
+	Contact = 0x1,           //
+	EntityAttack = 0x2,      // 实体攻击
+	Projectile = 0x3,        // 弹射物
+	Suffocation = 0x4,       // 窒息(卡方块)
+	Fall = 0x5,              // 摔落
+	Fire = 0x6,              // inFire(在火焰中)
+	FireTick = 0x7,          // onFire(自身着火)
+	Lava = 0x8,              // 岩浆
+	Drowning = 0x9,          // 溺水
+	BlockExplosion = 0x0A,   // 方块爆炸
+	EntityExplosion = 0x0B,  // 实体爆炸
+	Void = 0x0C,             // 虚空
+	Suicide = 0x0D,          // 自杀(?)
+	Magic = 0x0E,            // 魔法(药水)
+	Wither = 0x0F,           // 凋零效果
+	Starve = 0x10,           // 饥饿
+	Anvil = 0x11,            // 铁砧
+	Thorns = 0x12,           // 荆棘
+	FallingBlock = 0x13,     // 坠落方块砸中
+	Piston = 0x14,           // 中毒
+	FlyIntoWall = 0x15,      // 飞进墙里(鞘翅撞死)
+	Magma = 0x16,            // 岩浆块
+	Fireworks = 0x17,        // 烟花爆炸
+	Lightning = 0x18,        // 闪电
+	Charging = 0x19,         // 
+	Temperature = 0x1A,      // 
+};
+
+//------------------------------ Actor ------------------------------//
+
+inline Actor* fetchActor(ActorUniqueID uid) {
+	return SymCall(Symbol::Level::fetchActor, 
+		Actor*, Level*, ActorUniqueID, bool)(bdsws->level, uid, false);
+}
+
 //------------------------------ Player ------------------------------//
+
+// Note: return false in cb to stop forEach
 inline void forEachPlayer(std::function<bool(Player&)> cb) {
 	SymCall(Symbol::Level::forEachPlayer,
 		void, Level*, std::function<bool(Player&)>)(bdsws->level, cb);
@@ -98,6 +153,7 @@ inline Certificate* getCert(Player* pl) {
 #error "BDS version is wrong"
 #endif
 }
+
 inline xuid_t getXuid(Player* pl) {
 	std::string xuid_str = SymCall(Symbol::ExtendedCertificate::getXuid,
 		std::string, void*)(getCert(pl));
@@ -107,8 +163,81 @@ inline std::string getRealName(Player* pl) {
 	return SymCall(Symbol::ExtendedCertificate::getIdentityName,
 		std::string, void*)(getCert(pl));
 }
+inline mce::UUID getUuid(Player* pl) {
+#if defined(BDS_1_16)
+	return dAccess<mce::UUID, 2720>(pl);
+#endif
+}
+
+inline Player* getPlayerByXuid(xuid_t xid) {
+	Player* result = nullptr;
+	forEachPlayer([&](Player& pl) {
+		if (getXuid(&pl) == xid) {
+			result = &pl;
+			return false;
+		}
+		return true;
+	});
+	return result;
+}
+inline Player* getPlayerByUuid(const std::string& uuid) {
+	Player* result = nullptr;
+	forEachPlayer([&](Player& pl) {
+		if (getUuid(&pl).asString() == uuid) {
+			result = &pl;
+			return false;
+		}
+		return true;
+	});
+	return result;
+}
+inline Player* getPlayerByUniqueID(ActorUniqueID uid) {
+	Player* result = nullptr;
+	/*forEachPlayer([&](Player& pl) {
+		if (pl.getUniqueID().id == uid.id) {
+			result = &pl;
+			return false;
+		}
+		return true;
+	});*/
+	result = (Player*)fetchActor(uid);
+	return result;
+}
+inline Player* getPlayerByName(const std::string& name) {
+	Player* result = nullptr;
+	forEachPlayer([&](Player& pl) {
+		if (pl.getNameTag() == name) {
+			result = &pl;
+			return false;
+		}
+		return true;
+	});
+	return result;
+}
+inline Player* getPlayerByRealName(const std::string& realName) {
+	Player* result = nullptr;
+	forEachPlayer([&](Player& pl) {
+		if (getRealName(&pl) == realName) {
+			result = &pl;
+			return false;
+		}
+		return true;
+	});
+	return result;
+}
+
+inline Packet* createPacket(int id);
+inline void sendText(Player* pl, const std::string& text, TextType tp) {
+	auto pkt = createPacket(9);
+	std::string srcName = "Server";
+	dAccess<TextType, 32>(pkt) = tp;
+	dAccess<std::string*, 40>(pkt) = &srcName;
+	dAccess<std::string*, 80>(pkt) = const_cast<std::string*>(&text);
+	pl->sendNetworkPacket(*(Packet*)pkt);
+}
 
 //------------------------------ Network -----------------------------//
+
 inline std::string getClientAddress(NetworkIdentifier* nid) {
 	auto addr = bdsws->rakpeer->getAdr(*nid).toString();
 	//std::replace(addr.begin(), addr.end(), '|', ':');
@@ -142,6 +271,12 @@ inline double getPacketLossOfPlayer(NetworkIdentifier* nid) {
 	return np->getNetworkStatus().packetloss;
 }
 
+inline Packet* createPacket(int id) {
+	Packet* pkt = nullptr;
+	SymCall(Symbol::MinecraftPackets::creatPacket, void*, Packet**, int)(&pkt, id);
+	return pkt;
+}
+
 //------------------------- ConnectionRequest -------------------------//
 inline std::string getDeviceId(void* cr) {
 	return SymCall(Symbol::ConnectionRequest::getDeviceId, std::string, void*)(cr);
@@ -153,4 +288,3 @@ inline int getDeviceOS(void* cr) {
 }
 
 #endif // !MESS_H
-

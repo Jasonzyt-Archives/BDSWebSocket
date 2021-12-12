@@ -2,6 +2,7 @@
 #include "BDSWebSocket.h"
 #include "LangPack.h"
 #include "Crypt.h"
+#include "OfflineStorage.h"
 
 AESKey BDSWebSocket::getAESKey() {
 	AESKey ak;
@@ -23,6 +24,8 @@ BDSWebSocket::BDSWebSocket(Config* cfg) {
 	this->cfg.reset(cfg);
 	this->lpk.reset(new LangPack(PLUGIN_LANGPK, cfg->language));
 	this->ws.reset(new WebSocketServer);
+	this->ols.reset(new OfflineStorage(OFFLINE_DATA));
+	ols->init();
 	gcu.init();
 	cpcu.init();
 }

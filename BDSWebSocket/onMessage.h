@@ -16,20 +16,35 @@ struct onMessage {
 
 #define CALLBACK(x) nlohmann::json x(WSConn& conn, Message* msgp)
 
+CALLBACK(hello);
 CALLBACK(ConsoleLog);
 CALLBACK(getPerformanceUsages);
+CALLBACK(getWebSocketClients);
+
 CALLBACK(addWhiteList);
 CALLBACK(removeWhiteList);
 CALLBACK(getWhiteList);
+CALLBACK(getOnlinePlayers);
+CALLBACK(getOnlinePlayerInfo);
+CALLBACK(getOfflinePlayerInfo);
+CALLBACK(sendTextToPlayer);
+CALLBACK(executeCmd);
 
 #undef CALLBACK
 
 const std::unordered_map<std::string, onMessage> onMessages{
+	{"hello", {hello, {"name", "introduction", "others", "xuidString"}}},
 	{"consoleLog", {ConsoleLog, {"text"}}},
 	{"getPerformanceUsages", {getPerformanceUsages}},
+	{"getWebSocketClients", {getWebSocketClients}},
 	{"addWhiteList", {addWhiteList, {"name"}}},
 	{"removeWhiteList", {removeWhiteList, {}, {"name", "xuid"}}},
 	{"getWhiteList", {getWhiteList}},
+	{"getOnlinePlayers", {getOnlinePlayers}},
+	{"getOnlinePlayerInfo", {getOnlinePlayerInfo, {"player"}}},
+	{"getOfflinePlayerInfo", {getOfflinePlayerInfo, {}, {"xuid", "uuid", "realName"}}},
+	{"sendTextToPlayer", {sendTextToPlayer, {"player", "text", "textType"}}},
+	{"executeCmd", {executeCmd, {"cmd"}}}
 };
 
 #endif // !ONMESSAGE_H

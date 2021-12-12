@@ -46,6 +46,7 @@ static const std::string PLUGIN_FOLDER = "./plugins/BDSWebSocket/";
 static const std::string PLUGIN_CONFIG = PLUGIN_FOLDER + "config.json";
 static const std::string PLUGIN_LANGPK = PLUGIN_FOLDER + "langpack.json";
 static const std::string WEBSOCKET_LOG = PLUGIN_FOLDER + "websocket.log";
+static const std::string OFFLINE_DATA  = PLUGIN_FOLDER + "offline.json";
 
 class BDSWebSocket;
 extern std::unique_ptr<BDSWebSocket> bdsws;

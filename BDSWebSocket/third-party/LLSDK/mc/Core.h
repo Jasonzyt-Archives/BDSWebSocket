@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 //#include<lbpch.h>
 #define MCAPI __declspec(dllimport)
 #define MCINLINE inline
@@ -119,21 +119,23 @@ private:
 	char filler[0x10];
 
 public:
-	virtual void destruct1(unsigned int) = 0;
-	virtual bool isEntitySource() const = 0;
-	virtual bool isChildEntitySource() const = 0;
-
-private:
-	virtual void* unk0() = 0;
-	virtual void* unk1() = 0; //death msg
-	virtual void* unk2() = 0; //is creative
-	virtual void* unk3() = 0; //?
-public:
-	virtual ActorUniqueID getEntityUniqueID() const = 0;
-	virtual int getEntityType() const = 0;
-
-private:
-	virtual int getEntityCategories() const = 0;
+	/*0*/ virtual ~ActorDamageSource();
+	/*1*/ virtual bool isEntitySource() const;
+	/*2*/ virtual void __unk_vfn_0();
+	/*3*/ virtual bool isBlockSource() const;
+	/*4*/ virtual bool isFire() const;
+	/*5*/ virtual struct std::pair<std::string, std::vector<std::string> > getDeathMessage(std::string, class Actor*) const;
+	/*6*/ virtual bool getIsCreative() const;
+	/*7*/ virtual bool getIsWorldBuilder() const;
+	/*8*/ virtual void __unk_vfn_1();
+	/*9*/ virtual void __unk_vfn_2();
+	/*10*/ virtual int /*enum enum ActorCategory*/ getEntityCategories() const;
+	/*11*/ virtual bool getDamagingEntityIsCreative() const;
+	/*12*/ virtual bool getDamagingEntityIsWorldBuilder() const;
+	/*13*/ virtual struct ActorUniqueID getDamagingEntityUniqueID() const;
+	/*14*/ virtual int /*enum enum ActorType*/ getDamagingEntityType() const;
+	/*15*/ virtual int /*enum enum ActorCategory*/ getDamagingEntityCategories() const;
+	/*16*/ virtual std::unique_ptr<class ActorDamageSource> clone() const;
 };
 
 class ChunkPos {

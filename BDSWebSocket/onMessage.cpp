@@ -1,11 +1,12 @@
 #include "pch.h"
+#include "option.h"
 #include "Message.h"
 #include "System.h"
 #include "Mess.h"
 #include "BDSWebSocket.h"
 #include "ExtendedJson.h"
+#include "OfflineStorage.h"
 #include "WhiteList.h"
-#include "optional.h"
 #include <crow/crow_all.h>
 
 #define OPTION(x, y) getOption<x>(msgp->data, y)
@@ -14,23 +15,36 @@
 #define EMPTY_OBJECT nlohmann::json::object()
 
 template <typename T>
-optional<T> getOption(nlohmann::json json, const std::string& key) {
+option<T> getOption(nlohmann::json json, const std::string& key) {
 	if (json.count(key)) {
-		return optional(json.at(key).get<T>());
+		return option(json.at(key).get<T>());
 	}
-	return optional<T>();
+	return option<T>();
 }
 
 using namespace std;
 using namespace Logger;
 using WSConn = crow::websocket::connection;
 
-nlohmann::json ConsoleLog(WSConn& conn, Message* msgp) {
+nlohmann::json hello(WSConn& conn, Message* msgp) {
 	auto addr = conn.get_remote_ip() + ':' + to_string(conn.get_remote_port());
-	Info() << "WS Client " << addr << ": " << ARGUMENT(string, "text") << endl;
+	auto& settings = bdsws->ws->getClientSettings(addr);
+	settings.name = ARGUMENT(string, "name");
+	settings.intro = ARGUMENT(string, "introduction");
+	settings.others = ARGUMENT(nlohmann::json, "others");
+	settings.xuidString = ARGUMENT(bool, "xuidString");
 	return EMPTY_OBJECT;
 }
 
+// {"id":"123", "type":"consoleLog", "data":{"text":"awa"}}
+nlohmann::json ConsoleLog(WSConn& conn, Message* msgp) {
+	auto addr = conn.get_remote_ip() + ':' + to_string(conn.get_remote_port());
+	Info() << "WS Client " << addr << '(' << bdsws->ws->getClientSettings(addr).name 
+		<< "): " << ARGUMENT(string, "text") << endl;
+	return EMPTY_OBJECT;
+}
+
+// {"id":"123", "type":"getPerformUsages"}
 nlohmann::json getPerformanceUsages(WSConn& conn, Message* msgp) {
 	nlohmann::json data;
 	// CPU
@@ -51,6 +65,12 @@ nlohmann::json getPerformanceUsages(WSConn& conn, Message* msgp) {
 	for (auto& dName : dNames) {
 		data["disks"][dName.substr(0, 1)] = getDiskUsage(dName[0]);
 	}
+	return data;
+}
+
+nlohmann::json getWebSocketClients(WSConn& conn, Message* msgp) {
+	nlohmann::json data;
+	
 	return data;
 }
 
@@ -82,4 +102,65 @@ nlohmann::json getWhiteList(WSConn& conn, Message* msgp) {
 		data["list"].push_back({ {"name", name}, {"xuid", xuid} });
 	}
 	return data;
+}
+
+// {"id":"123", "type":"getOnlinePlayers"}
+nlohmann::json getOnlinePlayers(WSConn& conn, Message* msgp) {
+	nlohmann::json data;
+	auto ls = getAllPlayers();
+	for (auto& pl : ls) {
+		data["list"].push_back(pl->getUniqueID());
+	}
+	return data;
+}
+
+// {"id":"123", "type":"getOnlinePlayerInfo", "data":{"player":{...}}}
+nlohmann::json getOnlinePlayerInfo(WSConn& conn, Message* msgp) {
+	nlohmann::json data;
+	auto pl = ARGUMENT(Player*, "player");
+	if (pl) {
+		data["player"] = pl->getUniqueID(); // See ExtendedJson.cpp
+	}
+	else throw buildException("Player not found!");
+	return data;
+}
+
+nlohmann::json getOfflinePlayerInfo(WSConn& conn, Message* msgp) {
+	nlohmann::json data;
+	auto xuid = OPTION(xuid_t, "xuid");
+	auto uuid = OPTION(string, "uuid");
+	auto realName = OPTION(string, "realName");
+	PlayerData* pdata = nullptr;
+	if (xuid.set()) {
+		pdata = &bdsws->ols->getByXuid(xuid.val());
+	}
+	else if (uuid.set()) {
+		pdata = &bdsws->ols->getByUuid(uuid.val());
+	}
+	else if (realName.set()) {
+		pdata = &bdsws->ols->getByRealName(realName.val());
+	}
+	if (pdata) {
+		data = *pdata;
+		data["online"] = (pdata->lastJoin > pdata->lastLeft);
+	}
+	else {
+		throw buildException("Offline player not found!");
+	}
+	return data;
+}
+
+nlohmann::json sendTextToPlayer(WSConn& conn, Message* msgp) {
+	auto pl = ARGUMENT(Player*, "player");
+	auto text = ARGUMENT(string, "text");
+	auto type = ARGUMENT(int, "textType");
+	if (pl) {
+		sendText(pl, text, (TextType)type);
+	}
+	else throw buildException("Player not found!");
+	return EMPTY_OBJECT;
+}
+
+nlohmann::json executeCmd(WSConn& conn, Message* msg) {
+	return EMPTY_OBJECT;
 }

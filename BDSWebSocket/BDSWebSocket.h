@@ -11,6 +11,7 @@ class Level;
 class Player;
 class Minecraft;
 class NetworkIdentifier;
+class OfflineStorage;
 
 struct RakPeer_t;
 struct PropertiesSettings;
@@ -23,6 +24,7 @@ public:
 	std::unique_ptr<Config> cfg;
 	std::unique_ptr<LangPack> lpk;
 	std::unique_ptr<WebSocketServer> ws;
+	std::unique_ptr<OfflineStorage> ols;
 	GlobalCpuUsage gcu;
 	CurrentProcessCpuUsage cpcu;
 	// MC

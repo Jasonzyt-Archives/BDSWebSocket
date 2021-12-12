@@ -80,6 +80,9 @@ namespace Symbol {
 		// forEachPlayer
 		// void | Level* thiz, std::function<bool(Player&)>
 		SYMBOL forEachPlayer = "?forEachPlayer@Level@@QEBAXV?$function@$$A6A_NAEBVPlayer@@@Z@std@@@Z";
+		// fetchActor
+		// Actor* | Level* thiz, ActorUniqueID, bool
+		SYMBOL fetchActor = "?fetchEntity@Level@@QEBAPEAVActor@@UActorUniqueID@@_N@Z";
 	}
 	namespace ServerLevel {
 		// onServerLevelTick
@@ -90,6 +93,13 @@ namespace Symbol {
 		// onServerInit (to get Minecraft*)
 		// void | Minecraft* thiz
 		SYMBOL initAsDedicatedServer = "?initAsDedicatedServer@Minecraft@@QEAAXXZ";
+	}
+	namespace MinecraftPackets {
+		// Static function
+		// createPacket
+		// void* | Packet*, MinecraftPacketIds(int)
+		SYMBOL creatPacket = "?createPacket@MinecraftPackets@@SA?AV?$shared_ptr@V"
+			"Packet@@@std@@W4MinecraftPacketIds@@@Z";
 	}
 	namespace NetworkIdentifier {
 		// getClientAddress
@@ -136,12 +146,20 @@ namespace Symbol {
 	namespace Json {
 		namespace Value {
 			// toString
-			// std::string | Json::Value thiz, std::string
+			// std::string | Json::Value* thiz, std::string
 			SYMBOL asString = "?asString@Value@Json@@QEBA?AV?$basic_string@DU?$char_traits"
 				"@D@std@@V?$allocator@D@2@@std@@AEBV34@@Z";
 			// toInt
-			// int | Json::Value thiz, int
+			// int | Json::Value* thiz, int
 			SYMBOL asInt = "?asInt@Value@Json@@QEBAHH@Z";
+		}
+	}
+	namespace mce {
+		namespace UUID {
+			// asString
+			// std::string | UUID* thiz, std::string*(ret)
+			SYMBOL asString = "?asString@UUID@mce@@QEBA?AV?$basic_string@DU?$char_traits@"
+				"D@std@@V?$allocator@D@2@@std@@XZ";
 		}
 	}
 #elif defined(BDS_LATEST)

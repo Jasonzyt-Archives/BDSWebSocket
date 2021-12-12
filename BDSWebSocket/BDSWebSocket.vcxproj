@@ -149,9 +149,10 @@
     <ClInclude Include="ExtendedJson.h" />
     <ClInclude Include="LangPack.h" />
     <ClInclude Include="Logger.h" />
-    <ClInclude Include="mc\TextPacket.h" />
+    <ClInclude Include="mc\Packet.h" />
     <ClInclude Include="Mess.h" />
     <ClInclude Include="Message.h" />
+    <ClInclude Include="OfflineStorage.h" />
     <ClInclude Include="onMessage.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Symbols.h" />
@@ -169,7 +170,7 @@
     <ClCompile Include="Message.cpp" />
     <ClCompile Include="mod.cpp" />
     <ClCompile Include="onMessage.cpp" />
-    <ClCompile Include="optional.h" />
+    <ClCompile Include="option.h" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="WebSocketServer.cpp" />
   </ItemGroup>

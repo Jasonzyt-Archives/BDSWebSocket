@@ -3,25 +3,48 @@
 #include "nlohmann/json.hpp"
 #include "Message.h"
 
+#define ToJsonCallBack(type) void to_json(nlohmann::json& json, const type&)
+#define FromJsonCallBack(type) void from_json(const nlohmann::json& json, type&)
+
+class Player;
 class RawMessage;
 class Message;
+class Vec3;
+class BlockPos;
+struct PlayerData;
 struct DiskUsage;
 struct MemoryUsage;
 struct CpuUsage;
+struct ActorUniqueID;
 
-void to_json(nlohmann::json& json, const RawMessage& msg);
-void from_json(const nlohmann::json& json, RawMessage& msg);
+ToJsonCallBack(RawMessage);
+FromJsonCallBack(RawMessage);
 
-void to_json(nlohmann::json& json, const Message& msg);
-void from_json(const nlohmann::json& json, Message& msg);
+ToJsonCallBack(Message);
+FromJsonCallBack(Message);
 
-void to_json(nlohmann::json& json, const DiskUsage& du);
-void from_json(const nlohmann::json& json, DiskUsage& du);
+ToJsonCallBack(DiskUsage);
+FromJsonCallBack(DiskUsage);
 
-void to_json(nlohmann::json& json, const MemoryUsage& du);
-void from_json(const nlohmann::json& json, MemoryUsage& du);
+ToJsonCallBack(MemoryUsage);
+FromJsonCallBack(MemoryUsage);
 
-void to_json(nlohmann::json& json, const CpuUsage& du);
-void from_json(const nlohmann::json& json, CpuUsage& du);
+ToJsonCallBack(CpuUsage);
+FromJsonCallBack(CpuUsage);
+
+ToJsonCallBack(ActorUniqueID);
+FromJsonCallBack(ActorUniqueID);
+
+ToJsonCallBack(Vec3);
+FromJsonCallBack(Vec3);
+
+ToJsonCallBack(BlockPos);
+FromJsonCallBack(BlockPos);
+
+ToJsonCallBack(Player*); // NOT USED
+FromJsonCallBack(Player*);
+
+ToJsonCallBack(PlayerData);
+FromJsonCallBack(PlayerData);
 
 #endif // !EXTENDEDJSON_H

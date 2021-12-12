@@ -3,16 +3,21 @@
 #include <string>
 #include <vector>
 
-#if 0
-enum TextType;
-struct TextPacket {
+struct Packet {
+
 #if defined(BDS_1_16)
-	char basicPacket[32];
+	char filler[32];
 #elif defined(BDS_LATEST)
-	char basicPacket[40];
+	char filler[40];
 #else
 #error "BDS version is wrong"
 #endif
+
+};
+
+#if 0
+enum TextType;
+struct TextPacket : Packet {
 	TextType type;                         // 32 40
 	char align_0[7];                       // 33 41
 	std::string* sourceName;               // 40 48

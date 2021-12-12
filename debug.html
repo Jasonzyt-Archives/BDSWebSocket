@@ -39,6 +39,7 @@
 			width: 80%;
 			height: 60%;
 			border: 1px solid #ccc;
+			resize: none;
 		}
 
 		.wssender input {
@@ -72,7 +73,9 @@
 		<button id="disconnect" onclick="disconnect()">Disconnect</button>
 		<button id="clear" onclick="storage.set('history','[]');history = [];">Clear History</button>
 	</div>
-	<div class="wsoutput"><textarea id="output" style="font-size: 18px;" readonly></textarea></div>
+	<div class="wsoutput">
+		<textarea id="output" style="font-size: 18px;" readonly></textarea>
+	</div>
 	<div class="wssender"><input id="input" type="text" onkeydown="onInputKeyDown(event)"></input></div>
 </body>
 <script>
@@ -183,6 +186,7 @@
 			ws.close();
 		ws = new WebSocket("ws://" + wsuri);
 		ws.onopen = function () {
+			WS_Send('{"type":"hello","data":{"name":"Debugger","introduction":"WebSocket Debugger","others":null,"xuidString":true}}');
 			console.log("WebSocket connected!");
 			textareaAddLine("WebSocket connected!");
 		}
@@ -218,7 +222,7 @@
 		}
 	}
 	function disconnect() {
-		ws.close();
+		ws.close(0, "Bye!");
 	}
 	function onAddrChange(event) {
 		if (event.keyCode == 13) {

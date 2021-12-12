@@ -34,7 +34,7 @@
     <ClInclude Include="WhiteList.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="mc\TextPacket.h">
+    <ClInclude Include="mc\Packet.h">
       <Filter>MC</Filter>
     </ClInclude>
     <ClInclude Include="WebSocketLogger.h">
@@ -45,6 +45,9 @@
     </ClInclude>
     <ClInclude Include="onMessage.h">
       <Filter>WebSocket</Filter>
+    </ClInclude>
+    <ClInclude Include="OfflineStorage.h">
+      <Filter>Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -70,7 +73,7 @@
     <ClCompile Include="onMessage.cpp">
       <Filter>WebSocket</Filter>
     </ClCompile>
-    <ClCompile Include="optional.h">
+    <ClCompile Include="option.h">
       <Filter>Utils</Filter>
     </ClCompile>
   </ItemGroup>
