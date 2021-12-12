@@ -7,11 +7,11 @@
 struct PlayerData {
 	std::string name;
 	std::string realName;
-	xuid_t xuid;
+	xuid_t xuid = 0;
 	std::string uuid;
-	long long uid;
-	time_t lastJoin;
-	time_t lastLeft;
+	long long uid = -1;
+	time_t lastJoin = 0;
+	time_t lastLeft = 0;
 };
 
 class OfflineStorage {
@@ -22,6 +22,13 @@ class OfflineStorage {
 public:
 
 	OfflineStorage(const std::string& fpath): path(fpath) {}
+	~OfflineStorage() {
+		for (auto& pl : plData) {
+			if (pl.lastJoin > pl.lastLeft) {
+				pl.lastLeft = time(NULL);
+			}
+		}
+	}
 
 	void init() {
 		std::string content;
@@ -106,6 +113,16 @@ public:
 		PlayerData pdata;
 		plData.push_back(pdata);
 		return plData.back();
+	}
+
+	// Only call when the plugin starts
+	inline void checkData() {
+		for (auto& pl : plData) {
+			// If server stops abnormally, player data will be wrong
+			if (pl.lastJoin > pl.lastLeft) { 
+				pl.lastLeft = pl.lastJoin + 1;
+			}
+		}
 	}
 
 };

@@ -26,6 +26,7 @@ BDSWebSocket::BDSWebSocket(Config* cfg) {
 	this->ws.reset(new WebSocketServer);
 	this->ols.reset(new OfflineStorage(OFFLINE_DATA));
 	ols->init();
+	ols->checkData();
 	gcu.init();
 	cpcu.init();
 }

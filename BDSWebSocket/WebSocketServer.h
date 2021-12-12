@@ -7,8 +7,8 @@
 class Message;
 
 struct ClientSettings {
-	std::string name; // Project name
-	std::string intro; // Project introduction
+	std::string name = "Unknown"; // Project name
+	std::string intro = "Nothing"; // Project introduction
 	nlohmann::json others;
 
 	// JSON中的Xuid是否通过字符串传递(适配一些没有完整ULL的语言,如JavaScript)

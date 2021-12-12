@@ -126,6 +126,7 @@ THook(void, Symbol::Player::die, ServerPlayer* thiz, ActorDamageSource* dsrc) {
 			{"entity", {
 				{"type", typeName},
 				{"pos", src->getPos()},
+				{"name", src->getNameTag()},
 				{"uniqueID", src->getUniqueID().id}
 			}}
 		};
